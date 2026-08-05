@@ -17,6 +17,9 @@ import path from 'node:path';
 const PAPERS_DIR = 'src/content/papers';
 const API = 'https://export.arxiv.org/api/query';
 
+/** Each title costs up to two queries, so this is the per-title pause, not per-request. */
+const REQUEST_DELAY_MS = 6000;
+
 const argv = process.argv.slice(2);
 const flag = (name) => {
   const i = argv.indexOf(name);
@@ -41,10 +44,27 @@ function parseEntries(xml) {
   }));
 }
 
-async function query(params) {
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * arXiv rate-limits well before its documented ~3s/request suggests, and a 429 must
+ * never be confused with "this paper isn't on arXiv" — that would silently divert
+ * papers to manual entry. Retries with backoff, and throws if it still can't get through.
+ */
+async function query(params, attempt = 1) {
   const res = await fetch(`${API}?${params}`, {
     headers: { 'User-Agent': 'ai-interviewers.github.io metadata fetcher' },
   });
+
+  if (res.status === 429 || res.status >= 500) {
+    if (attempt > 5) throw new Error(`arXiv API returned ${res.status} after 5 attempts`);
+    const retryAfter = Number(res.headers.get('retry-after')) || 0;
+    const wait = Math.max(retryAfter * 1000, 5000 * 2 ** (attempt - 1));
+    console.log(`      rate limited (${res.status}), waiting ${Math.round(wait / 1000)}s…`);
+    await sleep(wait);
+    return query(params, attempt + 1);
+  }
+
   if (!res.ok) throw new Error(`arXiv API returned ${res.status}`);
   return parseEntries(await res.text());
 }
@@ -140,6 +160,7 @@ if (!specs.length) {
 await mkdir(PAPERS_DIR, { recursive: true });
 
 const notFound = [];
+const errored = [];
 const lowConfidence = [];
 
 for (const spec of specs) {
@@ -147,8 +168,10 @@ for (const spec of specs) {
   try {
     match = await resolve(spec);
   } catch (err) {
-    console.log(`✗ ${spec}\n    ${err.message}`);
-    notFound.push(spec);
+    // Kept apart from notFound: a transport failure says nothing about whether the
+    // paper is on arXiv, and conflating the two sends papers to manual entry wrongly.
+    console.log(`! ${spec}\n    lookup failed: ${err.message}`);
+    errored.push(`${spec} — ${err.message}`);
     continue;
   }
 
@@ -176,8 +199,7 @@ for (const spec of specs) {
     }
   }
 
-  // arXiv asks for ~3s between programmatic requests.
-  await new Promise((r) => setTimeout(r, 3000));
+  await sleep(REQUEST_DELAY_MS);
 }
 
 console.log(write ? '\nFiles written.' : '\nDry run — re-run with --write to create files.');
@@ -187,6 +209,11 @@ if (lowConfidence.length) {
   lowConfidence.forEach((m) => console.log(`  · "${m.spec}"\n    got "${m.got}" (${m.score.toFixed(2)})`));
 }
 if (notFound.length) {
-  console.log('\nNot found on arXiv — needs manual entry (likely a journal or ACM/IEEE venue):');
+  console.log('\nNot on arXiv — needs manual entry (likely an ACM/IEEE/journal venue):');
   notFound.forEach((s) => console.log(`  · ${s}`));
+}
+if (errored.length) {
+  console.log('\nLookup FAILED — status unknown, re-run these before assuming anything:');
+  errored.forEach((s) => console.log(`  ! ${s}`));
+  process.exitCode = 1;
 }
