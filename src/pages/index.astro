@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { BENCHMARK, SITE } from '../consts';
+import { getCollection } from 'astro:content';
+
+const papers = await getCollection('papers', ({ data }) => !data.draft);
+---
+
+<BaseLayout>
+  <section class="mx-auto max-w-3xl px-5 py-20">
+    <h1 class="font-display text-4xl font-semibold tracking-tight sm:text-5xl">
+      {SITE.tagline}
+    </h1>
+    <p class="mt-6 text-lg leading-relaxed" style="color: var(--color-ink-muted)">
+      Qualitative interviews surface the reasoning behind people's answers, but they are slow and
+      expensive to run at scale. A growing body of work asks whether AI systems can conduct those
+      interviews — autonomously or alongside a human researcher — and how well the resulting data
+      holds up. This site tracks that literature.
+    </p>
+
+    <div class="mt-10 flex flex-wrap gap-4">
+      <a
+        href="/papers"
+        class="rounded px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+        style="background: var(--color-accent)"
+      >
+        Browse {papers.length} {papers.length === 1 ? 'paper' : 'papers'}
+      </a>
+      <a
+        href="/benchmark"
+        class="rounded border px-4 py-2 text-sm font-medium transition-colors hover:opacity-70"
+        style="border-color: var(--color-rule)"
+      >
+        {BENCHMARK.name}
+      </a>
+    </div>
+
+    <p
+      class="mt-16 rounded border border-dashed p-4 text-sm"
+      style="border-color: var(--color-rule); color: var(--color-ink-muted)"
+    >
+      <strong style="color: var(--color-ink)">Phase 0 scaffold.</strong> Deployment plumbing,
+      schema, and shared chrome are in place. Landing copy, the papers index, and the visual
+      direction are still to come — see <code>PLAN.md</code>.
+    </p>
+  </section>
+</BaseLayout>

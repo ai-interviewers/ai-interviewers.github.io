@@ -1,0 +1,33 @@
+---
+import { MAINTAINER, REPO } from '../consts';
+
+// Build timestamp. Stated as "last built" rather than "last updated" because that
+// is what it actually measures — an honest label costs nothing and avoids implying
+// the paper list was reviewed on this date.
+const builtAt = new Date().toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  timeZone: 'UTC',
+});
+---
+
+<footer class="mt-20 border-t" style="border-color: var(--color-rule)">
+  <div
+    class="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-8 text-sm sm:flex-row sm:items-center sm:justify-between"
+    style="color: var(--color-ink-muted)"
+  >
+    <p>
+      Maintained by <a
+        href={MAINTAINER.url}
+        class="underline decoration-1 underline-offset-2 hover:opacity-70"
+        style="color: var(--color-ink)">{MAINTAINER.name}</a
+      >.
+      <a
+        href={REPO}
+        class="underline decoration-1 underline-offset-2 hover:opacity-70">Source on GitHub</a
+      >.
+    </p>
+    <p>Last built <time datetime={new Date().toISOString()}>{builtAt}</time></p>
+  </div>
+</footer>

@@ -1,0 +1,9 @@
+# Pre-launch: the site is not ready to be indexed.
+# At launch, replace this with the commented block below and set
+# `noindex` to false in src/layouts/BaseLayout.astro.
+User-agent: *
+Disallow: /
+
+# User-agent: *
+# Allow: /
+# Sitemap: https://ai-interviewers.github.io/sitemap-index.xml

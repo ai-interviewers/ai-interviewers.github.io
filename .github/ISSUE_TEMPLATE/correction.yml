@@ -1,0 +1,22 @@
+name: Correct an entry
+description: Report wrong or missing metadata on a paper already in the index.
+title: "[correction] "
+labels: ["correction"]
+body:
+  - type: input
+    id: paper
+    attributes:
+      label: Which paper?
+      description: Title or the URL of its page on this site.
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong?
+      description: Name the field and the correct value. A source helps.
+      placeholder: |
+        The `modality` is listed as text, but the study ran voice interviews (§3.2).
+    validations:
+      required: true

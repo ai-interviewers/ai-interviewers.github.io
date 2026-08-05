@@ -1,0 +1,22 @@
+---
+// GA4. Loaded only in production builds so local dev browsing and the Phase 2
+// mockup review don't pollute the property with self-traffic.
+const GA_ID = 'G-0NM3FBW1SV';
+const enabled = import.meta.env.PROD;
+---
+
+{
+  enabled && (
+    <>
+      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
+      <script is:inline define:vars={{ GA_ID }}>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+          dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', GA_ID);
+      </script>
+    </>
+  )
+}

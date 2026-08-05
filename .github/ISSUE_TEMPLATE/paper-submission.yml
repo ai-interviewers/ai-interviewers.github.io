@@ -1,0 +1,95 @@
+name: Suggest a paper
+description: Add a paper on AI-conducted or AI-assisted interviews to the index.
+title: "[paper] "
+labels: ["paper submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing. Only the title and link are required — leave anything
+        you are unsure about blank rather than guessing, and it will be filled in during review.
+
+  - type: input
+    id: title
+    attributes:
+      label: Paper title
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: Link
+      description: arXiv abstract page, DOI, or publisher landing page.
+      placeholder: https://arxiv.org/abs/...
+    validations:
+      required: true
+
+  - type: input
+    id: authors
+    attributes:
+      label: Authors
+      description: Comma-separated, in publication order.
+
+  - type: input
+    id: date
+    attributes:
+      label: Publication date
+      placeholder: 2025-04 or 2025-04-17
+
+  - type: input
+    id: venue
+    attributes:
+      label: Venue
+      description: Leave blank for an unpublished preprint.
+      placeholder: CHI 2025
+
+  - type: dropdown
+    id: autonomy
+    attributes:
+      label: Autonomous or AI-assisted?
+      description: Does the AI run the interview itself, or support a human interviewer?
+      options:
+        - "Not sure"
+        - Autonomous
+        - AI-assisted
+        - Both
+        - Not applicable
+      default: 0
+
+  - type: dropdown
+    id: modality
+    attributes:
+      label: Modality
+      options:
+        - "Not sure"
+        - Text
+        - Voice
+        - Multimodal
+        - Not applicable
+      default: 0
+
+  - type: checkboxes
+    id: paper_type
+    attributes:
+      label: Paper type
+      description: Check all that apply — many papers are more than one.
+      options:
+        - label: Introduces a new interviewer system
+        - label: Exploratory or position paper
+        - label: Evaluates or benchmarks interviewers
+        - label: Survey or literature review
+        - label: Contributes a dataset
+
+  - type: input
+    id: domains
+    attributes:
+      label: Domain tags
+      description: Comma-separated application areas.
+      placeholder: health, market research
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: Code or data links, why it belongs here, or corrections to the above.
