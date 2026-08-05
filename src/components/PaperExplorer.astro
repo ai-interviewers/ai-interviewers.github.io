@@ -1,0 +1,357 @@
+---
+/*
+ * Search, sort, facet filters, and the tile/list toggle over a server-rendered list of
+ * PaperCards. Every paper stays in the HTML — papers-filter.ts only shows and hides —
+ * so the full list is indexable and works without JS.
+ *
+ * No chart here: the papers-per-year visualization lives on the landing page instead.
+ */
+import { buildFacets, label, type Paper } from '../lib/papers';
+import PaperCard from './PaperCard.astro';
+
+interface Props {
+  papers: Paper[];
+}
+
+const { papers } = Astro.props;
+const facets = buildFacets(papers);
+
+const hiddenFacets = ['autonomy', 'modality', 'type', 'venuetype', 'domain'].filter(
+  (k) => !facets.some((f) => f.key === k),
+);
+---
+
+<div class="explorer" data-explorer data-view="tile">
+  <div class="explorer-body">
+    {/*
+      On mobile the facet list (16 domains alone) would push every paper below the
+      fold, so controls collapse behind this button. Deliberately not a <details>: a
+      closed <details> gets content-visibility:hidden on its content slot from the UA,
+      which a descendant rule cannot override, so a CSS "force open on desktop" trick
+      leaves the sidebar laid out but never painted. An explicit attribute toggle is
+      predictable in both directions.
+    */}
+    <div class="sidebar filter-drawer">
+      <button type="button" class="drawer-summary" data-drawer-toggle aria-expanded="false">
+        Search &amp; filters
+        <span class="drawer-hint">{papers.length} papers</span>
+      </button>
+
+      <div class="drawer-body">
+        <div class="control-block">
+          <label class="control-label" for="paper-search">Search</label>
+          <input
+            id="paper-search"
+            type="search"
+            data-search-input
+            placeholder="Title, author, abstract…"
+            class="search-input"
+          />
+        </div>
+
+        <div class="control-block">
+          <label class="control-label" for="paper-sort">Sort</label>
+          <select id="paper-sort" data-sort class="sort-select">
+            <option value="date-desc">Newest first</option>
+            <option value="date-asc">Oldest first</option>
+            <option value="title-asc">Title A–Z</option>
+            <option value="venue-asc">Venue type</option>
+          </select>
+        </div>
+
+        {
+          facets.map((facet) => (
+            <fieldset class="facet" class:list={[{ 'facet-scroll': facet.options.length > 8 }]}>
+              <legend class="control-label">{facet.legend}</legend>
+              {facet.options.map((opt) => (
+                <label class="facet-option">
+                  <input type="checkbox" data-filter={facet.key} value={opt.value} />
+                  <span class="facet-name">{label(opt.value)}</span>
+                  <span class="facet-count">{opt.count}</span>
+                </label>
+              ))}
+            </fieldset>
+          ))
+        }
+
+        {
+          hiddenFacets.length > 0 && (
+            <p class="facet-note">
+              Hidden: {hiddenFacets.join(', ')} — only one distinct value in the current data, so
+              filtering on it cannot change the results.
+            </p>
+          )
+        }
+      </div>
+    </div>
+
+    <section class="results" data-results>
+      <header class="results-head">
+        <p class="results-count">
+          <strong data-count>{papers.length}</strong> of {papers.length} papers
+        </p>
+        <div class="results-actions">
+          <button type="button" data-clear class="clear-btn" hidden>Clear filters</button>
+          <div class="view-toggle" role="group" aria-label="View">
+            <button type="button" data-view-btn="tile" aria-pressed="true">Tiles</button>
+            <button type="button" data-view-btn="list" aria-pressed="false">List</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="paper-list" data-paper-list>
+        {papers.map((paper) => <PaperCard paper={paper} />)}
+      </div>
+
+      <p class="empty" data-empty hidden>No papers match those filters.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+  import '../scripts/papers-filter';
+</script>
+
+<style>
+  .explorer {
+    max-width: 78rem;
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem 4rem;
+  }
+
+  .explorer-body {
+    display: grid;
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: 2.5rem;
+    align-items: start;
+  }
+
+  @media (max-width: 860px) {
+    .explorer-body {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 1rem;
+  }
+
+  .drawer-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  /* Long facet groups scroll rather than running the full height of the page. */
+  .facet-scroll {
+    max-height: 15rem;
+    overflow-y: auto;
+  }
+
+  /* Desktop: the toggle is unnecessary and the controls are always shown. */
+  .drawer-summary {
+    display: none;
+  }
+
+  @media (max-width: 860px) {
+    .sidebar {
+      position: static;
+    }
+
+    .drawer-summary {
+      display: flex;
+      width: 100%;
+      gap: 0.5rem;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.55rem 0.75rem;
+      background: var(--color-panel);
+      border: 1px solid var(--color-rule);
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      color: var(--color-ink);
+      cursor: pointer;
+    }
+
+    .drawer-hint {
+      color: var(--color-ink-muted);
+    }
+
+    /* Collapsed unless the toggle says otherwise. */
+    .filter-drawer:not([data-open]) > .drawer-body {
+      display: none;
+    }
+
+    .filter-drawer[data-open] > .drawer-summary {
+      margin-bottom: 1rem;
+    }
+  }
+
+  .control-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .control-label {
+    padding: 0;
+    font-size: 0.76rem;
+    font-weight: 500;
+    color: var(--color-ink-muted);
+  }
+
+  .search-input,
+  .sort-select {
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    background: var(--color-panel);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: var(--color-ink);
+  }
+
+  .search-input:focus-visible,
+  .sort-select:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+  }
+
+  .facet {
+    padding: 0;
+    margin: 0;
+    border: 0;
+  }
+
+  .facet-option {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.16rem 0;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+
+  .facet-option:hover .facet-name {
+    color: var(--color-accent);
+  }
+
+  .facet-option input {
+    accent-color: var(--color-accent);
+  }
+
+  .facet-name {
+    flex: 1;
+  }
+
+  .facet-count {
+    font-size: 0.76rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-ink-muted);
+  }
+
+  .facet legend + .facet-option {
+    margin-top: 0.35rem;
+  }
+
+  .facet-note {
+    padding: 0.55rem 0.65rem;
+    margin: 0;
+    border: 1px dashed var(--color-rule);
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: var(--color-ink-muted);
+  }
+
+  .results-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.8rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--color-rule);
+  }
+
+  .results-count {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--color-ink-muted);
+  }
+
+  .results-count strong {
+    font-size: 1rem;
+    color: var(--color-ink);
+  }
+
+  .results-actions {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+  }
+
+  .clear-btn {
+    padding: 0.3rem 0.6rem;
+    background: transparent;
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 0.78rem;
+    color: var(--color-ink-muted);
+    cursor: pointer;
+  }
+
+  .clear-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .view-toggle {
+    display: flex;
+    overflow: hidden;
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius);
+  }
+
+  .view-toggle button {
+    padding: 0.3rem 0.7rem;
+    background: transparent;
+    border: 0;
+    font-size: 0.78rem;
+    color: var(--color-ink-muted);
+    cursor: pointer;
+  }
+
+  .view-toggle button[aria-pressed='true'] {
+    background: var(--color-ink);
+    color: var(--color-panel);
+  }
+
+  /*
+   * Tile view is a responsive grid; list view is a single stacked column.
+   * align-items:start matters once abstracts are expandable — without it, expanding
+   * one card stretches every other card in its row to match.
+   */
+  .paper-list {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    align-items: start;
+  }
+
+  :global([data-view='list']) .paper-list {
+    display: block;
+    gap: 0;
+  }
+
+  .empty {
+    padding: 3rem 1rem;
+    font-size: 0.9rem;
+    color: var(--color-ink-muted);
+    text-align: center;
+  }
+</style>

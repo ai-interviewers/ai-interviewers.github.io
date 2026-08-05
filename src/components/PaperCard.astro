@@ -1,17 +1,17 @@
 ---
 /*
- * Shared card for Round 2 and 3. Structure is settled:
+ * The paper card. Structure settled in Phase 2 review:
  *
  *   · Title, all authors, year, and venue are always present, in tile and list view.
- *   · Venue top-right, as in direction D's slug line.
+ *   · Venue top-right.
  *   · Domain tags beside the abstract expander, highlighter-coloured per domain.
- *     Autonomy, modality, and paper type stay in the filters only.
+ *     Autonomy, modality, and paper type stay in the filters only — not shown here.
  *   · Thumbnails in tile view.
  *   · Abstract hidden behind an expander rather than shown by default.
  *   · The whole card opens the paper in a new tab.
  */
-import { dataAttrs, domainColor, shortVenue, year } from '../../lib/papers';
-import type { Paper } from '../../lib/papers';
+import { dataAttrs, domainColor, shortVenue, year } from '../lib/papers';
+import type { Paper } from '../lib/papers';
 
 const { paper } = Astro.props as { paper: Paper };
 const d = paper.data;
@@ -26,7 +26,7 @@ const initials = d.title
   .join('');
 ---
 
-<article class="card-h" {...dataAttrs(paper)}>
+<article class="card" {...dataAttrs(paper)}>
   <a class="thumb" href={d.url} target="_blank" rel="noopener" aria-hidden="true" tabindex="-1">
     {
       d.thumbnail ? (
@@ -49,11 +49,7 @@ const initials = d.title
 
     <p class="authors" title={authors}>{authors}</p>
 
-    {/*
-      Abstract expander and the domain tags share a row. Domains are the one piece of
-      classification that earns a place on the card — they say what the paper is about,
-      where autonomy and paper type are better left to the filters.
-    */}
+    {/* Abstract expander and domain tags share a row; the abstract sits below both. */}
     <div class="card-foot">
       {
         abstract && (
@@ -74,19 +70,26 @@ const initials = d.title
           </ul>
         )
       }
+
+      {/*
+        The card's stretched link opens the external paper, per instruction — so the
+        internal detail page (full metadata, BibTeX) needs its own way in. Lifted above
+        the stretched link like the abstract toggle so it stays independently clickable.
+      */}
+      <a href={`/papers/${paper.id}`} class="details-link">Details</a>
     </div>
 
     {/*
-      The abstract lives outside the footer row so expanding it never displaces the tags.
-      Revealed by :has() rather than by nesting inside <details>, which keeps it working
-      without JavaScript and keeps the text in the HTML for search engines either way.
+      Outside the footer row so expanding it never displaces the tags. Revealed with
+      :has() rather than nested inside <details>, which keeps it working without
+      JavaScript and keeps the text in the HTML for search engines either way.
     */}
     {abstract && <p class="abstract">{abstract}</p>}
   </div>
 </article>
 
 <style>
-  .card-h {
+  .card {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -95,7 +98,7 @@ const initials = d.title
     border-radius: var(--radius);
   }
 
-  .card-h:hover {
+  .card:hover {
     border-color: var(--color-accent);
   }
 
@@ -142,19 +145,18 @@ const initials = d.title
   .yr,
   .venue {
     font-family: var(--font-mono);
-    font-size: 0.66rem;
+    font-size: 0.74rem;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.04em;
   }
 
   .yr {
     flex: none;
-    font-weight: 700;
-    color: var(--color-ink);
+    font-weight: 500;
+    color: var(--color-ink-muted);
   }
 
   /*
-   * No text-transform here: acronyms like CHI and EMNLP are already capitalised in the
+   * No text-transform: acronyms like CHI and EMNLP are already capitalised in the
    * data, and forcing uppercase turned "Preprint" into shouting.
    */
   .venue {
@@ -169,7 +171,7 @@ const initials = d.title
     margin: 0.45rem 0 0;
     font-family: var(--font-display);
     font-size: 0.97rem;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1.32;
     letter-spacing: -0.01em;
   }
@@ -179,9 +181,13 @@ const initials = d.title
     text-decoration: none;
   }
 
+  .title a:hover {
+    color: var(--color-accent);
+  }
+
   /*
-   * Stretched link: the whole card opens the paper. The abstract expander is lifted above
-   * it so it stays independently clickable.
+   * Stretched link: the whole card opens the paper. The abstract expander is lifted
+   * above it (z-index) so it stays independently clickable.
    */
   .title a::after {
     position: absolute;
@@ -222,11 +228,11 @@ const initials = d.title
     list-style: none;
   }
 
-  /* Highlighter swipe, colour keyed to the domain. Name is always present as text. */
+  /* Highlighter swipe, colour keyed to the domain. The name is always shown as text. */
   .domain {
     padding: 0.1rem 0.4rem;
     background: var(--tag);
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     line-height: 1.35;
     color: var(--color-ink);
   }
@@ -238,11 +244,8 @@ const initials = d.title
     padding: 0.12rem 0.45rem 0.12rem 0.3rem;
     border: 1px solid var(--color-rule);
     border-radius: var(--radius);
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    letter-spacing: 0.06em;
+    font-size: 0.74rem;
     color: var(--color-ink-muted);
-    text-transform: uppercase;
     cursor: pointer;
     list-style: none;
   }
@@ -263,6 +266,19 @@ const initials = d.title
   .abstract-toggle summary:hover {
     border-color: var(--color-accent);
     color: var(--color-accent);
+  }
+
+  .details-link {
+    position: relative;
+    z-index: 2;
+    margin-left: auto;
+    font-size: 0.76rem;
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .details-link:hover {
+    text-decoration: underline;
   }
 
   .abstract {
@@ -289,7 +305,7 @@ const initials = d.title
   }
 
   /* ---------- list view: a ledger row, still carrying all four fields ---------- */
-  :global([data-view='list']) .card-h {
+  :global([data-view='list']) .card {
     display: block;
     background: transparent;
     border: 0;
@@ -297,7 +313,7 @@ const initials = d.title
     border-radius: 0;
   }
 
-  :global([data-view='list']) .card-h:hover {
+  :global([data-view='list']) .card:hover {
     background: var(--color-accent-soft);
   }
 
@@ -322,7 +338,6 @@ const initials = d.title
   :global([data-view='list']) .title {
     margin: 0;
     font-size: 0.88rem;
-    font-weight: 500;
   }
 
   :global([data-view='list']) .authors {

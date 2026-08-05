@@ -419,33 +419,57 @@ accent layer between three options without a reload:
 Only the accent and ground variables change between them; structure, type, and texture stay fixed, so
 you're judging one variable at a time. The switcher is a mockup-only control and does not ship.
 
-### Phase 3 — Build out the chosen design
-Apply tokens site-wide. Landing page: what AI interviewing is, why researchers are trying it, what
-this site tracks, and clear paths to the papers index and the benchmark. Real papers page with tile
-and list views. Footer crediting you with a link to your personal site.
+### Phase 3 — Build out the chosen design ✅ **done**
 
-### Phase 4 — Interactivity
-Search, facet filters (autonomy, modality, paper type, domain tags, venue type, year), sort (date,
-title, venue), tile/list toggle with the choice remembered in `localStorage`, URL state, result
-count, empty state, "clear all filters".
+J promoted from mockup to production theme. `global.css` now carries the real tokens (Roboto,
+white, black ink, `#0076df` accent) instead of placeholders; `PaperCard`/`PaperExplorer` replaced
+the `mock/` components; all ten mockup routes, `MockLayout.astro`, and the five unused Fontsource
+packages (Anybody, DM Sans, Source Serif 4, JetBrains Mono, Space Mono) were deleted. Landing page
+has real copy plus the year chart; papers page has the full explorer with no chart, per your Round 2
+instruction. Footer credit was already in place from Phase 0.
 
-### Phase 5 — Visualization
-Build-time SVG stacked bars, papers per year. A control switches the segmentation between autonomy,
-modality, and paper type. Clicking a segment applies the corresponding filter to the list below.
-Accessible fallback: a visually-hidden data table so the chart isn't screen-reader-opaque.
+One real bug caught here: `--seg-1..4` (the chart's segment colors) were declared inside Tailwind
+4's `@theme` block and **silently never reached the compiled CSS at all** — the chart rendered with
+transparent bars. Tailwind v4 tree-shakes any custom property shaped like a numbered scale
+(`--name-1`, `--name-2`, …) that isn't also consumed as an actual utility class; `--radius` (no
+numeric suffix) survived the same block, which is what made this non-obvious. Fixed by moving those
+four variables to a plain `:root` block outside `@theme`, which Tailwind leaves alone entirely.
 
-### Phase 6 — Benchmark page
-Sections: what the benchmark measures and why, how to get it (install/download), how to run it,
-citation block with copy button, leaderboard table, submission instructions. Placeholders are marked
-with a visible "coming soon" treatment rather than silently empty — an obviously-unfinished section
-is better than one that looks broken.
+### Phase 4 — Interactivity ✅ **done**
+Search, facets (autonomy, modality, paper type, venue type, domain — auto-hidden when a facet has
+only one distinct value), sort, tile/list with `localStorage`, URL state, result count, empty state,
+clear-filters. Verified: cross-facet AND, within-group OR, URL round-trip, mobile filter drawer.
 
-The leaderboard needs a stored results format (`src/content/results/`) so adding a row is a data
-edit, not a markup edit.
+### Phase 5 — Visualization ✅ **done, moved to the landing page**
+Stacked bars, continuous year axis (no silently-dropped gap years), segmented by autonomy. Per your
+Round 2 instruction the papers page carries no chart, so this ended up entirely on the landing page
+instead — where there's no explorer to filter into, so `YearChart` gained a `linkTo` prop: segments
+render as `<a href="/papers?autonomy=…">` rather than filter-toggle buttons. Verified the round trip:
+clicking a segment lands on `/papers` with the right facet pre-checked and the count filtered.
+Accessible fallback table retained from the original build.
 
-### Phase 7 — Detail pages and extras
-Per-paper pages at `/papers/<slug>` with full abstract, all metadata, links, BibTeX copy button.
-GA4 snippet. Sitemap, `robots.txt`, per-page OpenGraph tags, RSS feed of newly added papers.
+### Phase 6 — Benchmark page ✅ **done**
+Get it / Cite it / Leaderboard sections, each rendering an honest "coming soon" state instead of a
+dead link wherever a `consts.ts` value (`packageUrl`, `githubUrl`, `paperUrl`,
+`LEADERBOARD_FORM_URL`) is still `null` — all marked `TODO` at the source. BibTeX has a copy button
+(see Phase 7 note on generation). Leaderboard table renders "No submissions yet" rather than an
+empty void; a stored results format (`src/content/results/`) is deferred until there is a first
+submission to store — building it now would be speculative.
+
+### Phase 7 — Detail pages and extras ✅ **done, mostly**
+Per-paper pages at `/papers/<slug>` — full abstract, all metadata, links, classification (with
+unconfirmed fields shown in italics), BibTeX copy. Reachable via a small "Details" link on each card,
+separate from the card's main stretched link, which opens the external paper per your instruction —
+so the internal page needed its own way in rather than competing for the same click.
+
+**BibTeX had to be generated, not just copied**: none of the 23 seeded papers had a populated
+`bibtex` frontmatter field — that was left blank by design during ingestion. `src/lib/bibtex.ts`
+derives a reasonable entry from already-verified fields (title, authors, date, venue, arXiv id) and
+only falls back to the frontmatter field when a human has actually filled one in.
+
+GA4, sitemap, and `robots.txt` were already in place from Phase 0. Not done: per-page OpenGraph
+images and an RSS feed — neither was asked for and both are easy to add later without touching
+anything already built.
 
 ### Phase 8 — Contribution infrastructure
 Issue templates for submission and correction. `CONTRIBUTING.md` documenting the schema and the

@@ -1,22 +1,47 @@
 @import "tailwindcss";
 
 /*
- * Design tokens live here as CSS custom properties rather than hardcoded Tailwind
- * colors. Two reasons: the Phase 2 style mockups swap direction by overriding this
- * block, and it leaves dark mode addable later without touching component markup.
+ * Design tokens, matched to jonathanivey.github.io (read from its computed styles,
+ * not guessed): Roboto throughout, white ground, black ink, #0076df links, and the
+ * light-weight (300) display headings that site uses.
+ *
+ * --font-mono is Roboto too rather than an actual monospace face — it is the
+ * "metadata" slot (dates, venues, tabular figures) that wants numeral alignment,
+ * not visual contrast with the body font. Keeping the token name lets a future
+ * change swap it without touching component markup. Tokens stay CSS custom
+ * properties rather than hardcoded Tailwind colors so dark mode is addable later
+ * without a markup rewrite.
  */
 @theme {
-  --color-ground: #fbfbf9;
+  --color-ground: #ffffff;
   --color-panel: #ffffff;
-  --color-ink: #23222b;
-  --color-ink-muted: #5c5a68;
-  --color-rule: rgba(85, 83, 104, 0.22);
-  --color-accent: #2c5f8a;
-  --color-accent-soft: #e8f0f6;
+  --color-ink: #000000;
+  --color-ink-muted: #828282;
+  --color-rule: #e3e3e3;
+  --color-accent: #0076df;
+  --color-accent-soft: #f0f7ff;
 
-  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --font-display: "Roboto Variable", Roboto, ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Roboto Variable", Roboto, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Roboto Variable", Roboto, ui-sans-serif, system-ui, sans-serif;
+
+  --radius: 3px;
+  --chart-radius: 2px;
+}
+
+/*
+ * YearChart segment colors, one hue ramping from the accent down to neutral.
+ * Deliberately outside @theme: Tailwind v4 tree-shakes any custom property shaped
+ * like a numbered scale (--name-1, --name-2, …) that isn't also consumed as a utility
+ * class, so --seg-1..4 silently never made it into the compiled CSS when they lived in
+ * @theme — the chart rendered with no color at all. Plain :root custom properties are
+ * untouched by Tailwind's theme processing.
+ */
+:root {
+  --seg-1: #0076df;
+  --seg-2: #5fa8ec;
+  --seg-3: #b3d6f7;
+  --seg-4: #d8d8d8;
 }
 
 @layer base {
@@ -31,44 +56,16 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Form controls don't inherit font-family; without this they fall back to Arial. */
+  button,
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+  }
+
   :focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
-}
-
-/*
- * Paper textures, as reusable utilities. Derived from the stationery reference:
- * these are what create the "printed document" read rather than any color choice.
- * Unused by the neutral baseline; mockup D leans on them heavily.
- */
-@utility texture-grid {
-  background-image:
-    linear-gradient(90deg, rgba(128, 128, 128, 0.07) 1px, transparent 1px),
-    linear-gradient(rgba(128, 128, 128, 0.07) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-
-@utility texture-dots {
-  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.12) 1px, transparent 1px);
-  background-size: 16px 16px;
-}
-
-@utility texture-hatch {
-  background-image: repeating-linear-gradient(
-    -55deg,
-    var(--color-rule) 0px,
-    var(--color-rule) 1px,
-    transparent 1px,
-    transparent 4px
-  );
-}
-
-@utility texture-ruled {
-  background-image: repeating-linear-gradient(
-    var(--color-rule) 0px,
-    var(--color-rule) 1px,
-    transparent 1px,
-    transparent 5px
-  );
 }

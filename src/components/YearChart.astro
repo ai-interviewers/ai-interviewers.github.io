@@ -5,9 +5,16 @@ interface Props {
   papers: Paper[];
   segmentBy?: 'autonomy' | 'type';
   height?: number;
+  /**
+   * When rendered inside a PaperExplorer, segments are filter-toggle buttons picked up
+   * by papers-filter.ts. Standalone (e.g. the landing page has no explorer to filter),
+   * pass a base URL and segments become links to the papers page with the facet
+   * pre-selected, so clicking still does something.
+   */
+  linkTo?: string;
 }
 
-const { papers, segmentBy = 'autonomy', height = 150 } = Astro.props;
+const { papers, segmentBy = 'autonomy', height = 150, linkTo } = Astro.props;
 const { rows, segments, max } = papersByYear(papers, segmentBy);
 
 // Chart segments are filter controls, so the key must match the facet key the
@@ -35,16 +42,28 @@ const filterKey = segmentBy === 'autonomy' ? 'autonomy' : 'type';
             {
               row.counts
                 .filter((c) => c.count > 0)
-                .map((c) => (
-                  <button
-                    type="button"
-                    class="chart-seg"
-                    data-chart-filter={`${filterKey}:${c.segment}`}
-                    style={`--seg: var(--seg-${segments.indexOf(c.segment) + 1}); --share: ${(c.count / row.total) * 100}%`}
-                    title={`${row.year} · ${label(c.segment)} · ${c.count}`}
-                    aria-label={`Filter to ${label(c.segment)} papers`}
-                  />
-                ))
+                .map((c) => {
+                  const style = `--seg: var(--seg-${segments.indexOf(c.segment) + 1}); --share: ${(c.count / row.total) * 100}%`;
+                  const title = `${row.year} · ${label(c.segment)} · ${c.count}`;
+                  return linkTo ? (
+                    <a
+                      class="chart-seg"
+                      href={`${linkTo}?${filterKey}=${encodeURIComponent(c.segment)}`}
+                      style={style}
+                      title={title}
+                      aria-label={`View ${label(c.segment)} papers from ${row.year}`}
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      class="chart-seg"
+                      data-chart-filter={`${filterKey}:${c.segment}`}
+                      style={style}
+                      title={title}
+                      aria-label={`Filter to ${label(c.segment)} papers`}
+                    />
+                  );
+                })
             }
           </div>
           <span class="chart-total">{row.total || ''}</span>

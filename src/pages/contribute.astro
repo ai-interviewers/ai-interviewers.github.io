@@ -1,13 +1,83 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { LEADERBOARD_FORM_URL, REPO } from '../consts';
 ---
 
-<BaseLayout title="Contribute">
+<BaseLayout
+  title="Contribute"
+  description="Suggest a paper, correct metadata, or submit InterviewBench results."
+>
   <section class="mx-auto max-w-3xl px-5 py-20">
-    <h1 class="font-display text-3xl font-semibold tracking-tight">Contribute</h1>
-    <p class="mt-4 text-lg" style="color: var(--color-ink-muted)">Suggest a paper, correct metadata, or submit leaderboard results.</p>
-    <p class="mt-10 rounded border border-dashed p-4 text-sm" style="border-color: var(--color-rule); color: var(--color-ink-muted)">
-      Placeholder — built in a later phase. See <code>PLAN.md</code>.
+    <h1 class="text-3xl font-light tracking-tight sm:text-4xl" style="letter-spacing: -0.015em">
+      Contribute
+    </h1>
+    <p class="mt-4 text-lg leading-relaxed" style="color: var(--color-ink-muted)">
+      Suggest a paper, correct metadata on an existing entry, or submit InterviewBench results.
     </p>
+
+    <div class="mt-14 grid gap-5 sm:grid-cols-2">
+      <a
+        href={`${REPO}/issues/new?template=paper-submission.yml`}
+        class="block rounded border p-5 transition-colors hover:border-current"
+        style={`border-color: var(--color-rule); color: var(--color-accent)`}
+      >
+        <h2 class="text-base font-medium" style="color: var(--color-ink)">Suggest a paper</h2>
+        <p class="mt-2 text-sm" style="color: var(--color-ink-muted)">
+          Open a structured GitHub issue. Only a title and link are required — leave anything
+          you're unsure about blank rather than guessing.
+        </p>
+      </a>
+
+      <a
+        href={`${REPO}/issues/new?template=correction.yml`}
+        class="block rounded border p-5 transition-colors hover:border-current"
+        style={`border-color: var(--color-rule); color: var(--color-accent)`}
+      >
+        <h2 class="text-base font-medium" style="color: var(--color-ink)">Correct an entry</h2>
+        <p class="mt-2 text-sm" style="color: var(--color-ink-muted)">
+          Spotted wrong or outdated metadata on a paper already listed? Report it here.
+        </p>
+      </a>
+    </div>
+
+    <div class="mt-10">
+      <h2 class="text-lg font-medium">InterviewBench results</h2>
+      <p class="mt-2 text-sm leading-relaxed" style="color: var(--color-ink-muted)">
+        {
+          LEADERBOARD_FORM_URL ? (
+            <>
+              Submit your results through{' '}
+              <a href={LEADERBOARD_FORM_URL} class="underline decoration-1 underline-offset-2" style="color: var(--color-accent)">
+                this form
+              </a>
+              {' '}— they're reviewed and added to the leaderboard manually.
+            </>
+          ) : (
+            <>
+              The submission form isn't live yet. See the{' '}
+              <a href="/benchmark" class="underline decoration-1 underline-offset-2" style="color: var(--color-accent)">
+                benchmark page
+              </a>
+              {' '}for the current leaderboard status.
+            </>
+          )
+        }
+      </p>
+    </div>
+
+    <div class="mt-10">
+      <h2 class="text-lg font-medium">Adding a paper directly</h2>
+      <p class="mt-2 text-sm leading-relaxed" style="color: var(--color-ink-muted)">
+        Comfortable with a pull request? See{' '}
+        <a
+          href={`${REPO}/blob/main/CONTRIBUTING.md`}
+          class="underline decoration-1 underline-offset-2"
+          style="color: var(--color-accent)"
+        >
+          CONTRIBUTING.md
+        </a>{' '}
+        for the paper schema, controlled vocabularies, and maintenance scripts.
+      </p>
+    </div>
   </section>
 </BaseLayout>

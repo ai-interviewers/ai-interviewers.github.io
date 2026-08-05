@@ -8,9 +8,6 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   site: 'https://ai-interviewers.github.io',
   integrations: [sitemap()],
-  // The dev toolbar sits bottom-centre and intercepts clicks on the Phase 2 mockups'
-  // palette switcher. Off while comparing directions.
-  devToolbar: { enabled: false },
   vite: {
     plugins: [tailwindcss()]
   }

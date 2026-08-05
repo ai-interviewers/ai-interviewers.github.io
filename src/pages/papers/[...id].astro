@@ -1,0 +1,132 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CopyButton from '../../components/CopyButton.astro';
+import { toBibtex } from '../../lib/bibtex';
+import {
+  domainColor,
+  firstAuthor,
+  formatDate,
+  getPapers,
+  isUnconfirmed,
+  label,
+  shortVenue,
+} from '../../lib/papers';
+
+export async function getStaticPaths() {
+  const papers = await getPapers();
+  return papers.map((paper) => ({ params: { id: paper.id }, props: { paper } }));
+}
+
+const { paper } = Astro.props;
+const d = paper.data;
+const { Content } = await render(paper);
+const bibtex = toBibtex(paper);
+
+const links = [
+  { label: 'Read the paper', href: d.url },
+  d.pdfUrl && { label: 'PDF', href: d.pdfUrl },
+  d.code_url && { label: 'Code', href: d.code_url },
+  d.dataset_url && { label: 'Dataset', href: d.dataset_url },
+].filter(Boolean) as { label: string; href: string }[];
+---
+
+<BaseLayout title={d.title} description={paper.body?.slice(0, 155)}>
+  <article class="mx-auto max-w-3xl px-5 py-16">
+    <a href="/papers" class="text-sm" style="color: var(--color-accent)">&larr; All papers</a>
+
+    <h1 class="mt-4 text-2xl font-medium leading-tight sm:text-3xl">{d.title}</h1>
+
+    <p class="mt-3 text-base" style="color: var(--color-ink-muted)">
+      {d.authors.join(', ')}
+    </p>
+
+    <p class="mt-1 text-sm" style="color: var(--color-ink-muted)">
+      {formatDate(d.date)} · {shortVenue(paper)}
+    </p>
+
+    <div class="mt-5 flex flex-wrap gap-3">
+      {
+        links.map((l) => (
+          <a
+            href={l.href}
+            target="_blank"
+            rel="noopener"
+            class="rounded border px-3 py-1.5 text-sm transition-colors hover:opacity-70"
+            style="border-color: var(--color-rule)"
+          >
+            {l.label}
+          </a>
+        ))
+      }
+    </div>
+
+    {
+      d.domains.length > 0 && (
+        <ul class="mt-5 flex flex-wrap gap-1.5">
+          {d.domains.map((domain) => (
+            <li
+              class="rounded px-2 py-0.5 text-xs"
+              style={`background: ${domainColor(domain)}; color: var(--color-ink)`}
+            >
+              {domain}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    <div class="prose mt-8 max-w-none text-base leading-relaxed" style="color: var(--color-ink)">
+      <Content />
+    </div>
+
+    <!-- Classification -->
+    <div class="mt-10 rounded border p-4" style="border-color: var(--color-rule)">
+      <h2 class="text-xs font-medium uppercase tracking-wide" style="color: var(--color-ink-muted)">
+        Classification
+      </h2>
+      <dl class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-4">
+        <div>
+          <dt style="color: var(--color-ink-muted)">Autonomy</dt>
+          <dd class:list={[{ italic: isUnconfirmed(paper, 'autonomy') }]}>
+            {d.autonomy ? label(d.autonomy) : 'Unclassified'}
+          </dd>
+        </div>
+        <div>
+          <dt style="color: var(--color-ink-muted)">Modality</dt>
+          <dd class:list={[{ italic: isUnconfirmed(paper, 'modality') }]}>
+            {d.modality ? label(d.modality) : 'Unclassified'}
+          </dd>
+        </div>
+        <div>
+          <dt style="color: var(--color-ink-muted)">Paper type</dt>
+          <dd class:list={[{ italic: isUnconfirmed(paper, 'paperType') }]}>
+            {d.paperType.length > 0 ? d.paperType.map(label).join(', ') : 'Unclassified'}
+          </dd>
+        </div>
+        <div>
+          <dt style="color: var(--color-ink-muted)">Venue type</dt>
+          <dd>{label(d.venueType)}</dd>
+        </div>
+      </dl>
+      {
+        paper.data.needsReview.length > 0 && (
+          <p class="mt-3 text-xs" style="color: var(--color-ink-muted)">
+            Fields in italics are model-assigned and not yet confirmed by a human.
+          </p>
+        )
+      }
+    </div>
+
+    <!-- Cite -->
+    <div class="mt-10">
+      <h2 class="text-xs font-medium uppercase tracking-wide" style="color: var(--color-ink-muted)">
+        Cite
+      </h2>
+      <div class="mt-3 flex items-start justify-between gap-4 rounded border p-4" style="border-color: var(--color-rule)">
+        <pre class="min-w-0 flex-1 overflow-x-auto text-xs leading-relaxed"><code>{bibtex}</code></pre>
+        <CopyButton text={bibtex} label="Copy BibTeX" />
+      </div>
+    </div>
+  </article>
+</BaseLayout>

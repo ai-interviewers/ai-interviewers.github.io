@@ -1,13 +1,131 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import CopyButton from '../components/CopyButton.astro';
+import { BENCHMARK, LEADERBOARD_FORM_URL } from '../consts';
 ---
 
-<BaseLayout title="InterviewBench">
+<BaseLayout title={BENCHMARK.name} description={BENCHMARK.description}>
   <section class="mx-auto max-w-3xl px-5 py-20">
-    <h1 class="font-display text-3xl font-semibold tracking-tight">InterviewBench</h1>
-    <p class="mt-4 text-lg" style="color: var(--color-ink-muted)">A benchmark for AI Interviewers that predicts real-world performance with simulated participants.</p>
-    <p class="mt-10 rounded border border-dashed p-4 text-sm" style="border-color: var(--color-rule); color: var(--color-ink-muted)">
-      Placeholder — built in a later phase. See <code>PLAN.md</code>.
+    <h1 class="text-3xl font-light tracking-tight sm:text-4xl" style="letter-spacing: -0.015em">
+      {BENCHMARK.name}
+    </h1>
+    <p class="mt-4 text-lg leading-relaxed" style="color: var(--color-ink-muted)">
+      {BENCHMARK.description}
     </p>
+
+    <!-- Get it -->
+    <div class="mt-14">
+      <h2 class="text-lg font-medium">Get it</h2>
+      {
+        BENCHMARK.packageUrl || BENCHMARK.githubUrl ? (
+          <div class="mt-3 flex flex-wrap gap-3">
+            {BENCHMARK.packageUrl && (
+              <a
+                href={BENCHMARK.packageUrl}
+                class="rounded px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+                style="background: var(--color-accent)"
+              >
+                Install package
+              </a>
+            )}
+            {BENCHMARK.githubUrl && (
+              <a
+                href={BENCHMARK.githubUrl}
+                class="rounded border px-4 py-2 text-sm font-medium transition-colors hover:opacity-70"
+                style="border-color: var(--color-rule)"
+              >
+                View on GitHub
+              </a>
+            )}
+          </div>
+        ) : (
+          <p
+            class="mt-3 rounded border border-dashed p-4 text-sm"
+            style="border-color: var(--color-rule); color: var(--color-ink-muted)"
+          >
+            <strong style="color: var(--color-ink)">Coming soon.</strong> The package isn't public
+            yet — this section will link to install instructions and the source once it is.
+          </p>
+        )
+      }
+    </div>
+
+    <!-- Paper / citation -->
+    <div class="mt-14">
+      <h2 class="text-lg font-medium">Cite it</h2>
+      {
+        !BENCHMARK.paperUrl && (
+          <p class="mt-1 text-sm" style="color: var(--color-ink-muted)">
+            The preprint isn't out yet — the citation below is provisional and will change.
+          </p>
+        )
+      }
+      <div class="mt-3 flex items-start justify-between gap-4 rounded border p-4" style="border-color: var(--color-rule)">
+        <pre class="min-w-0 flex-1 overflow-x-auto text-xs leading-relaxed" style="color: var(--color-ink)"><code>{BENCHMARK.bibtex}</code></pre>
+        <CopyButton text={BENCHMARK.bibtex} label="Copy BibTeX" />
+      </div>
+      {
+        BENCHMARK.paperUrl && (
+          <a
+            href={BENCHMARK.paperUrl}
+            class="mt-3 inline-block text-sm underline decoration-1 underline-offset-2"
+            style="color: var(--color-accent)"
+          >
+            Read the paper
+          </a>
+        )
+      }
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="mt-14">
+      <h2 class="text-lg font-medium">Leaderboard</h2>
+      <p class="mt-1 text-sm" style="color: var(--color-ink-muted)">
+        Results are self-reported and added manually — the "Verified" column marks entries we have
+        independently confirmed.
+      </p>
+
+      <div class="mt-4 overflow-x-auto rounded border" style="border-color: var(--color-rule)">
+        <table class="w-full text-left text-sm">
+          <thead>
+            <tr class="border-b" style="border-color: var(--color-rule)">
+              <th class="px-4 py-2 font-medium">System</th>
+              <th class="px-4 py-2 font-medium">Score</th>
+              <th class="px-4 py-2 font-medium">Submitted by</th>
+              <th class="px-4 py-2 font-medium">Verified</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="px-4 py-6 text-center" colspan="4" style="color: var(--color-ink-muted)">
+                No submissions yet.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-4">
+        {
+          LEADERBOARD_FORM_URL ? (
+            <a
+              href={LEADERBOARD_FORM_URL}
+              class="rounded px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+              style="background: var(--color-accent)"
+            >
+              Submit your results
+            </a>
+          ) : (
+            <p
+              class="rounded border border-dashed p-4 text-sm"
+              style="border-color: var(--color-rule); color: var(--color-ink-muted)"
+            >
+              <strong style="color: var(--color-ink)">Submission form coming soon.</strong> Results
+              will be collected via a form and added here manually.
+            </p>
+          )
+        }
+      </div>
+    </div>
   </section>
 </BaseLayout>

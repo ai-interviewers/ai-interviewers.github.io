@@ -1,13 +1,24 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PaperExplorer from '../../components/PaperExplorer.astro';
+import { getPapers } from '../../lib/papers';
+
+const papers = await getPapers();
 ---
 
-<BaseLayout title="Papers">
-  <section class="mx-auto max-w-3xl px-5 py-20">
-    <h1 class="font-display text-3xl font-semibold tracking-tight">Papers</h1>
-    <p class="mt-4 text-lg" style="color: var(--color-ink-muted)">The index of research on AI-conducted and AI-assisted interviews.</p>
-    <p class="mt-10 rounded border border-dashed p-4 text-sm" style="border-color: var(--color-rule); color: var(--color-ink-muted)">
-      Placeholder — built in a later phase. See <code>PLAN.md</code>.
-    </p>
-  </section>
+<BaseLayout
+  title="Papers"
+  description="An index of research on AI-conducted and AI-assisted qualitative interviews."
+>
+  <header class="border-b" style="border-color: var(--color-rule)">
+    <div class="mx-auto max-w-6xl px-5 py-10">
+      <h1 class="text-3xl font-light tracking-tight sm:text-4xl">Papers</h1>
+      <p class="mt-3 max-w-2xl text-base" style="color: var(--color-ink-muted)">
+        {papers.length} papers on AI-conducted and AI-assisted qualitative interviews. Search, filter,
+        and switch between tile and list view.
+      </p>
+    </div>
+  </header>
+
+  <PaperExplorer papers={papers} />
 </BaseLayout>

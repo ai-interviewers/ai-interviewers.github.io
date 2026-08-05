@@ -1,21 +1,23 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import YearChart from '../components/YearChart.astro';
 import { BENCHMARK, SITE } from '../consts';
-import { getCollection } from 'astro:content';
+import { getPapers } from '../lib/papers';
 
-const papers = await getCollection('papers', ({ data }) => !data.draft);
+const papers = await getPapers();
 ---
 
 <BaseLayout>
   <section class="mx-auto max-w-3xl px-5 py-20">
-    <h1 class="font-display text-4xl font-semibold tracking-tight sm:text-5xl">
+    <h1 class="text-4xl font-light tracking-tight sm:text-5xl" style="letter-spacing: -0.015em">
       {SITE.tagline}
     </h1>
     <p class="mt-6 text-lg leading-relaxed" style="color: var(--color-ink-muted)">
       Qualitative interviews surface the reasoning behind people's answers, but they are slow and
       expensive to run at scale. A growing body of work asks whether AI systems can conduct those
       interviews — autonomously or alongside a human researcher — and how well the resulting data
-      holds up. This site tracks that literature.
+      holds up. This site tracks that literature and hosts {BENCHMARK.name}, a benchmark for
+      evaluating AI interviewers directly.
     </p>
 
     <div class="mt-10 flex flex-wrap gap-4">
@@ -34,14 +36,15 @@ const papers = await getCollection('papers', ({ data }) => !data.draft);
         {BENCHMARK.name}
       </a>
     </div>
+  </section>
 
-    <p
-      class="mt-16 rounded border border-dashed p-4 text-sm"
-      style="border-color: var(--color-rule); color: var(--color-ink-muted)"
-    >
-      <strong style="color: var(--color-ink)">Phase 0 scaffold.</strong> Deployment plumbing,
-      schema, and shared chrome are in place. Landing copy, the papers index, and the visual
-      direction are still to come — see <code>PLAN.md</code>.
+  <section class="mx-auto max-w-3xl px-5 pb-20">
+    <h2 class="text-lg font-medium">Papers per year</h2>
+    <p class="mt-1 text-sm" style="color: var(--color-ink-muted)">
+      Segmented by autonomy. Click a segment to see those papers.
     </p>
+    <div class="mt-6">
+      <YearChart papers={papers} segmentBy="autonomy" height={180} linkTo="/papers" />
+    </div>
   </section>
 </BaseLayout>
