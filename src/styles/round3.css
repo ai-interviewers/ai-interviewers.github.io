@@ -1,0 +1,137 @@
+/*
+ * Round 3. E's structure, H's lighter tones, no texture. Two themes:
+ *
+ *   I · Light index card — the consolidated candidate
+ *   J · Personal site    — matched to jonathanivey.github.io
+ *
+ * Both carry a year-highlight palette switcher, since the year swipe is the one place
+ * colour has to be chosen and four schemes read very differently on real data.
+ */
+
+/* =========================================================
+   I · Light index card
+   ========================================================= */
+body[data-variant='i'] {
+  --color-ground: #fbfaf7;
+  --color-panel: #ffffff;
+  --color-ink: #1c1b19;
+  --color-ink-muted: #6b665e;
+  --color-rule: #e6e2d9;
+  --color-accent: #2f5d7c;
+  --color-accent-soft: #f2f5f7;
+  --color-highlight: #ffe066;
+
+  --font-display: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, monospace;
+
+  --seg-1: #2f5d7c;
+  --seg-2: #7fa3b8;
+  --seg-3: #c3d3dd;
+  --seg-4: #dcd8cf;
+
+  --radius: 3px;
+  --chart-radius: 2px;
+  --texture-base: 0;
+}
+
+/* =========================================================
+   J · Matched to jonathanivey.github.io
+   Roboto, white ground, black ink, #0076df links, light headings.
+   ========================================================= */
+body[data-variant='j'] {
+  --color-ground: #ffffff;
+  --color-panel: #ffffff;
+  --color-ink: #000000;
+  --color-ink-muted: #828282;
+  --color-rule: #e3e3e3;
+  --color-accent: #0076df;
+  --color-accent-soft: #f0f7ff;
+  --color-highlight: #ffe066;
+
+  --font-display: 'Roboto Variable', Roboto, ui-sans-serif, sans-serif;
+  --font-body: 'Roboto Variable', Roboto, ui-sans-serif, sans-serif;
+  --font-mono: 'Roboto Mono', ui-monospace, monospace;
+
+  --seg-1: #0076df;
+  --seg-2: #5fa8ec;
+  --seg-3: #b3d6f7;
+  --seg-4: #d8d8d8;
+
+  --radius: 3px;
+  --chart-radius: 2px;
+  --texture-base: 0;
+}
+
+/* The site's defining typographic move is a light-weight display face. */
+body[data-variant='j'] .mock-title {
+  font-weight: 300;
+  letter-spacing: -0.015em;
+}
+
+body[data-variant='j'] .card-h .title {
+  font-weight: 500;
+}
+
+body[data-variant='j'] .card-h .title a:hover {
+  color: var(--color-accent);
+}
+
+/* Panels sit on white, so they need a visible edge rather than a tint. */
+body[data-variant='j'] .card-h {
+  border-color: var(--color-rule);
+}
+
+/* =========================================================
+   Year-highlight palettes
+   Applied via --yr-<year> on the card; unknown years fall back to
+   --color-highlight, so the scheme never breaks as the list grows.
+   ========================================================= */
+
+/* A · Marker pack — a box of highlighters. Playful, encodes nothing. */
+[data-yearpalette='marker'] {
+  --yr-2019: #ffe066;
+  --yr-2020: #a8ecd0;
+  --yr-2021: #ffc2d4;
+  --yr-2022: #b8e0ff;
+  --yr-2023: #d9f18f;
+  --yr-2024: #e0c3fc;
+  --yr-2025: #ffd0a1;
+  --yr-2026: #9be7de;
+}
+
+/* B · Amber ramp — one hue, pale for older, saturated for newer. Encodes recency. */
+[data-yearpalette='amber'] {
+  --yr-2019: #fdf3cf;
+  --yr-2020: #fcecb8;
+  --yr-2021: #fbe4a0;
+  --yr-2022: #fada88;
+  --yr-2023: #f9d070;
+  --yr-2024: #f8c455;
+  --yr-2025: #f7b73a;
+  --yr-2026: #f5a623;
+}
+
+/* C · Cool to warm — the strongest recency signal; old reads cold, new reads hot. */
+[data-yearpalette='spectrum'] {
+  --yr-2019: #cfe0f5;
+  --yr-2020: #d5e7ef;
+  --yr-2021: #dcefe0;
+  --yr-2022: #e6f2c9;
+  --yr-2023: #f1f3ab;
+  --yr-2024: #fbee8a;
+  --yr-2025: #ffe066;
+  --yr-2026: #ffc53d;
+}
+
+/* D · Single yellow — the control. One highlighter, no year encoding. */
+[data-yearpalette='single'] {
+  --yr-2019: #ffe066;
+  --yr-2020: #ffe066;
+  --yr-2021: #ffe066;
+  --yr-2022: #ffe066;
+  --yr-2023: #ffe066;
+  --yr-2024: #ffe066;
+  --yr-2025: #ffe066;
+  --yr-2026: #ffe066;
+}

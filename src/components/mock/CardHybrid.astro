@@ -1,21 +1,21 @@
 ---
 /*
- * Round 2 card. One component for every Round 2 direction — they differ only in tokens
- * and ornament, so the structure below is the agreed structure:
+ * Shared card for Round 2 and 3. Structure is settled:
  *
- *   · Title, author, year, and venue are always present, in both tile and list view.
- *   · Venue sits top-right, as in direction D's slug line.
+ *   · Title, all authors, year, and venue are always present, in tile and list view.
+ *   · Venue top-right, as in direction D's slug line.
  *   · No tags or classification badges — those live in the filters only.
- *   · Thumbnails appear in tile view.
- *
- * Built on direction C's compact, tabular base.
+ *   · Thumbnails in tile view.
+ *   · Abstract hidden behind an expander rather than shown by default.
+ *   · The whole card opens the paper in a new tab.
  */
-import { dataAttrs, firstAuthor, shortVenue, year } from '../../lib/papers';
+import { dataAttrs, shortVenue, year } from '../../lib/papers';
 import type { Paper } from '../../lib/papers';
 
 const { paper } = Astro.props as { paper: Paper };
 const d = paper.data;
-const abstract = paper.body ?? '';
+const abstract = paper.body?.trim() ?? '';
+const authors = d.authors.join(', ');
 const initials = d.title
   .replace(/[^A-Za-z ]/g, '')
   .split(' ')
@@ -25,7 +25,11 @@ const initials = d.title
   .join('');
 ---
 
-<article class="card-h" {...dataAttrs(paper)}>
+<article
+  class="card-h"
+  {...dataAttrs(paper)}
+  style={`--yr-color: var(--yr-${year(paper)}, var(--color-highlight))`}
+>
   <a class="thumb" href={d.url} target="_blank" rel="noopener" aria-hidden="true" tabindex="-1">
     {
       d.thumbnail ? (
@@ -39,21 +43,29 @@ const initials = d.title
   <div class="body">
     <header class="slug">
       <span class="yr">{year(paper)}</span>
-      <span class="venue">{shortVenue(paper)}</span>
+      <span class="venue" title={d.venue ?? undefined}>{shortVenue(paper)}</span>
     </header>
 
     <h3 class="title">
       <a href={d.url} target="_blank" rel="noopener">{d.title}</a>
     </h3>
 
-    <p class="authors">{firstAuthor(paper)}</p>
+    <p class="authors" title={authors}>{authors}</p>
 
-    <p class="abstract">{abstract.slice(0, 190)}{abstract.length > 190 ? '…' : ''}</p>
+    {
+      abstract && (
+        <details class="abstract-toggle">
+          <summary>Abstract</summary>
+          <p class="abstract">{abstract}</p>
+        </details>
+      )
+    }
   </div>
 </article>
 
 <style>
   .card-h {
+    position: relative;
     display: flex;
     flex-direction: column;
     background: var(--color-panel);
@@ -95,10 +107,9 @@ const initials = d.title
     display: flex;
     flex: 1;
     flex-direction: column;
-    padding: 0.75rem 0.9rem 0.9rem;
+    padding: 0.75rem 0.9rem 0.85rem;
   }
 
-  /* Year left, venue right — D's slug line. */
   .slug {
     display: flex;
     gap: 0.6rem;
@@ -111,22 +122,32 @@ const initials = d.title
     font-family: var(--font-mono);
     font-size: 0.66rem;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
 
+  /* Highlighter swipe on the year; the colour can vary by year. */
   .yr {
+    flex: none;
+    padding: 0.05rem 0.32rem;
+    background: var(--yr-color);
     font-weight: 700;
     color: var(--color-ink);
   }
 
+  /*
+   * No text-transform here: acronyms like CHI and EMNLP are already capitalised in the
+   * data, and forcing uppercase turned "Preprint" into shouting.
+   */
   .venue {
+    overflow: hidden;
     color: var(--color-ink-muted);
     text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .title {
-    margin: 0.4rem 0 0;
+    margin: 0.45rem 0 0;
     font-family: var(--font-display);
     font-size: 0.97rem;
     font-weight: 600;
@@ -139,16 +160,68 @@ const initials = d.title
     text-decoration: none;
   }
 
+  /*
+   * Stretched link: the whole card opens the paper. The abstract expander is lifted above
+   * it so it stays independently clickable.
+   */
+  .title a::after {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    content: '';
+  }
+
   .authors {
     margin: 0.3rem 0 0;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
+    line-height: 1.45;
     color: var(--color-ink-muted);
   }
 
+  .abstract-toggle {
+    position: relative;
+    z-index: 2;
+    margin-top: 0.6rem;
+  }
+
+  .abstract-toggle summary {
+    display: inline-flex;
+    gap: 0.3rem;
+    align-items: center;
+    padding: 0.12rem 0.45rem 0.12rem 0.3rem;
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+    color: var(--color-ink-muted);
+    text-transform: uppercase;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .abstract-toggle summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .abstract-toggle summary::before {
+    content: '+';
+    font-weight: 700;
+  }
+
+  .abstract-toggle[open] summary::before {
+    content: '−';
+  }
+
+  .abstract-toggle summary:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
   .abstract {
-    margin: 0.5rem 0 0;
+    margin: 0.55rem 0 0;
     font-size: 0.8rem;
-    line-height: 1.58;
+    line-height: 1.6;
     color: var(--color-ink-muted);
   }
 
@@ -166,16 +239,16 @@ const initials = d.title
   }
 
   :global([data-view='list']) .thumb,
-  :global([data-view='list']) .abstract {
+  :global([data-view='list']) .abstract-toggle {
     display: none;
   }
 
   :global([data-view='list']) .body {
     display: grid;
-    grid-template-columns: 3.2rem minmax(0, 1fr) 10rem 7.5rem;
+    grid-template-columns: 3.6rem minmax(0, 1fr) 12rem 8rem;
     gap: 0 1rem;
     align-items: baseline;
-    padding: 0.5rem 0.6rem;
+    padding: 0.45rem 0.6rem;
   }
 
   :global([data-view='list']) .slug {
@@ -190,20 +263,19 @@ const initials = d.title
 
   :global([data-view='list']) .authors {
     margin: 0;
-    font-size: 0.76rem;
-    white-space: nowrap;
     overflow: hidden;
+    font-size: 0.75rem;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  /* Venue is last in the grid, so it lands hard right. */
   :global([data-view='list']) .venue {
     order: 4;
   }
 
-  @media (max-width: 700px) {
+  @media (max-width: 760px) {
     :global([data-view='list']) .body {
-      grid-template-columns: 3rem minmax(0, 1fr);
+      grid-template-columns: 3.4rem minmax(0, 1fr);
     }
 
     :global([data-view='list']) .authors,

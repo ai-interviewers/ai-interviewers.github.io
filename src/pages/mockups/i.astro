@@ -1,0 +1,17 @@
+---
+import MockLayout from '../../layouts/MockLayout.astro';
+import Explorer from '../../components/mock/Explorer.astro';
+import { getPapers } from '../../lib/papers';
+
+const papers = await getPapers();
+---
+
+<MockLayout
+  variant="i"
+  yearPalette="amber"
+  name="AI Interviewers"
+  eyebrow="Round 3 · I · Light index card"
+  lede="E's structure on lighter stock, no texture. Abstracts sit behind an expander, all authors are listed, the whole card opens the paper in a new tab, and venue casing follows the data so acronyms stay capitalised while Preprint does not shout. Use the control bottom-right to compare year-highlight schemes."
+>
+  <Explorer papers={papers} variant="i" chartPosition="none" />
+</MockLayout>

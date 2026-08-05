@@ -146,6 +146,16 @@ function init(root: HTMLElement) {
     apply();
   });
 
+  // Mobile filter drawer. Desktop hides the toggle entirely and shows the controls.
+  const drawer = root.querySelector<HTMLElement>('[data-explorer] .filter-drawer, .filter-drawer');
+  const drawerToggle = root.querySelector<HTMLElement>('[data-drawer-toggle]');
+  drawerToggle?.addEventListener('click', () => {
+    const open = drawer?.hasAttribute('data-open');
+    if (open) drawer?.removeAttribute('data-open');
+    else drawer?.setAttribute('data-open', '');
+    drawerToggle.setAttribute('aria-expanded', String(!open));
+  });
+
   // Chart segments double as filter controls.
   for (const seg of root.querySelectorAll<HTMLElement>('[data-chart-filter]')) {
     seg.addEventListener('click', () => {

@@ -287,6 +287,44 @@ the winner propagates to every page by swapping tokens rather than rewriting mar
 You review at `npm run dev`, on desktop and with the browser in mobile width. Mockup routes are
 deleted once you choose.
 
+#### Round 3 — consolidated candidate ✅ **built**
+
+E's structure on lighter (H-like) stock, texture dropped. Content changes, all applied to the
+shared card so they hold in every direction:
+
+- Abstracts sit behind a `+ ABSTRACT` expander instead of showing by default, and the expanded
+  version is the **full** abstract rather than a truncation.
+- **All** authors listed, not just the first; ellipsised with a full-text tooltip in list view.
+- The **whole card** opens the paper in a new tab, via a stretched link. The abstract expander is
+  lifted above it so it stays independently clickable.
+- Venue casing follows the data: `CHI EA 2026` and `EMNLP 2024 Demo` keep their capitals, while
+  `Preprint` no longer shouts. The forced `text-transform: uppercase` is gone.
+
+Two themes:
+
+- **I · Light index card** — Inter + Space Mono, warm-white, highlighter on the year.
+- **J · Personal site** — matched to jonathanivey.github.io, read off the live site rather than
+  guessed: Roboto, `#ffffff` ground, `#000` ink, `#0076df` links, `#828282` muted, and the
+  light-weight (300) display headings the site uses.
+
+**Year-highlight schemes**, switchable on both pages: `amber` (one hue, pale→saturated),
+`spectrum` (cool→warm), `marker` (a box of highlighters), `single` (control). The first two encode
+recency, so the colour carries information; `marker` is livelier but arbitrary. Since the year is
+also written as text, none of them rely on colour alone.
+
+Three bugs worth recording:
+
+1. **The `<details>` filter drawer never painted on desktop.** A closed `<details>` gets
+   `content-visibility: hidden` from the UA on its content slot, which cannot be overridden from a
+   descendant — so the "force open with CSS" rule left the sidebar laid out at full height but
+   invisible. Replaced with an explicit attribute toggle, which is predictable in both directions.
+2. **Expanding one abstract stretched every other card in its grid row.** Fixed with
+   `align-items: start` on the tile grid.
+3. The dev server served stale component CSS through several HMR cycles, which made a working rule
+   look broken. Diagnosed by grepping the production bundle, then confirmed after clearing
+   `.astro` and `node_modules/.vite`. Worth reaching for a clean rebuild before believing a
+   dev-only symptom.
+
 #### Round 2 — the hybrid ✅ **built**
 
 Round 1 established that C's compact base was right and that D's transcript idea was appealing but

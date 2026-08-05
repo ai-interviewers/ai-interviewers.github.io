@@ -271,6 +271,7 @@
   overflow-y: auto;
 }
 
+/* Desktop: the toggle is unnecessary and the controls are always shown. */
 .drawer-summary {
   display: none;
 }
@@ -282,6 +283,7 @@
 
   .drawer-summary {
     display: flex;
+    width: 100%;
     gap: 0.5rem;
     align-items: center;
     justify-content: space-between;
@@ -292,6 +294,7 @@
     font-family: var(--font-mono);
     font-size: 0.72rem;
     letter-spacing: 0.06em;
+    color: var(--color-ink);
     text-transform: uppercase;
     cursor: pointer;
   }
@@ -304,15 +307,13 @@
     color: var(--color-ink-muted);
   }
 
-  .filter-drawer[open] .drawer-summary {
-    margin-bottom: 1rem;
+  /* Collapsed unless the toggle says otherwise. */
+  .filter-drawer:not([data-open]) > .drawer-body {
+    display: none;
   }
-}
 
-/* Desktop: always visible, whatever the details open state is. */
-@media (min-width: 861px) {
-  .filter-drawer > .drawer-body {
-    display: flex !important;
+  .filter-drawer[data-open] > .drawer-summary {
+    margin-bottom: 1rem;
   }
 }
 
@@ -481,11 +482,16 @@
   border-style: dashed;
 }
 
-/* Tile view is a responsive grid; list view is a single stacked column. */
+/*
+ * Tile view is a responsive grid; list view is a single stacked column.
+ * align-items:start matters once abstracts are expandable — without it, expanding one
+ * card stretches every other card in its row to match.
+ */
 .paper-list {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  align-items: start;
 }
 
 [data-view='list'] .paper-list {

@@ -6,26 +6,43 @@ import '@fontsource-variable/jetbrains-mono';
 import '@fontsource-variable/anybody';
 import '@fontsource-variable/dm-sans';
 import '@fontsource/space-mono';
+import '@fontsource-variable/roboto';
 import '../styles/mockups.css';
 import '../styles/round2.css';
+import '../styles/round3.css';
 
 interface Props {
-  variant: 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
+  variant: 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j';
   name: string;
   eyebrow: string;
   lede: string;
   palette?: string;
   /** Round 2 only. Starting texture strength; adjustable on the page. */
   texture?: 'none' | 'subtle' | 'medium' | 'strong';
+  /** Round 3 only. Starting year-highlight scheme; adjustable on the page. */
+  yearPalette?: 'amber' | 'spectrum' | 'marker' | 'single';
 }
 
-const { variant, name, eyebrow, lede, palette, texture = 'medium' } = Astro.props;
+const {
+  variant,
+  name,
+  eyebrow,
+  lede,
+  palette,
+  texture = 'medium',
+  yearPalette = 'amber',
+} = Astro.props;
+
+const ROUND_3 = [
+  { id: 'i', label: 'I · Light index card' },
+  { id: 'j', label: 'J · Personal site' },
+];
 
 const ROUND_2 = [
-  { id: 'e', label: 'E · Index card' },
-  { id: 'f', label: 'F · Ledger' },
-  { id: 'g', label: 'G · Manuscript' },
-  { id: 'h', label: 'H · Warm minimal' },
+  { id: 'e', label: 'E' },
+  { id: 'f', label: 'F' },
+  { id: 'g', label: 'G' },
+  { id: 'h', label: 'H' },
 ];
 
 const ROUND_1 = [
@@ -35,7 +52,18 @@ const ROUND_1 = [
   { id: 'd', label: 'D' },
 ];
 
-const round = ROUND_2.some((d) => d.id === variant) ? '2' : '1';
+const round = ROUND_3.some((d) => d.id === variant)
+  ? '3'
+  : ROUND_2.some((d) => d.id === variant)
+    ? '2'
+    : '1';
+
+const YEAR_PALETTES = [
+  { id: 'amber', label: 'Amber ramp' },
+  { id: 'spectrum', label: 'Cool→warm' },
+  { id: 'marker', label: 'Marker pack' },
+  { id: 'single', label: 'Single' },
+];
 ---
 
 <!doctype html>
@@ -51,6 +79,7 @@ const round = ROUND_2.some((d) => d.id === variant) ? '2' : '1';
     data-palette={palette}
     data-round={round}
     data-texture={round === '2' ? texture : undefined}
+    data-yearpalette={round === '3' ? yearPalette : undefined}
   >
     <div class="mock-page">
       <header class="mock-header">
@@ -61,15 +90,15 @@ const round = ROUND_2.some((d) => d.id === variant) ? '2' : '1';
           <nav class="mock-nav" aria-label="Mockup directions">
             <a href="/mockups">Index</a>
             {
-              ROUND_2.map((d) => (
+              ROUND_3.map((d) => (
                 <a href={`/mockups/${d.id}`} aria-current={d.id === variant ? 'page' : undefined}>
                   {d.label}
                 </a>
               ))
             }
-            <span class="mock-nav-sep">Round 1</span>
+            <span class="mock-nav-sep">Earlier</span>
             {
-              ROUND_1.map((d) => (
+              [...ROUND_2, ...ROUND_1].map((d) => (
                 <a href={`/mockups/${d.id}`} aria-current={d.id === variant ? 'page' : undefined}>
                   {d.label}
                 </a>
@@ -93,6 +122,23 @@ const round = ROUND_2.some((d) => d.id === variant) ? '2' : '1';
           </div>
         )
       }
+
+      {
+        round === '3' && (
+          <div class="palette-bar" role="group" aria-label="Year highlight palette">
+            <span>Year colour</span>
+            {YEAR_PALETTES.map((p) => (
+              <button
+                type="button"
+                data-yearpalette-btn={p.id}
+                aria-pressed={String(p.id === yearPalette)}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        )
+      }
     </div>
 
     {
@@ -103,6 +149,21 @@ const round = ROUND_2.some((d) => d.id === variant) ? '2' : '1';
           for (const btn of buttons) {
             btn.addEventListener('click', () => {
               document.body.dataset.texture = btn.dataset.textureBtn;
+              for (const b of buttons) b.setAttribute('aria-pressed', String(b === btn));
+            });
+          }
+        </script>
+      )
+    }
+
+    {
+      round === '3' && (
+        <script>
+          {/* Mockup-only control; swaps the year-highlight scheme. */}
+          const buttons = document.querySelectorAll('[data-yearpalette-btn]');
+          for (const btn of buttons) {
+            btn.addEventListener('click', () => {
+              document.body.dataset.yearpalette = btn.dataset.yearpaletteBtn;
               for (const b of buttons) b.setAttribute('aria-pressed', String(b === btn));
             });
           }

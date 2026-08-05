@@ -38,13 +38,35 @@ const ROUND_2 = [
 ---
 
 <MockLayout
-  variant="e"
-  texture="subtle"
-  name="Round 2"
-  eyebrow="Style directions · pick one, or mix"
-  lede="Four treatments over one shared card. Every one is built on direction C's compact base, drops the papers-per-year chart, adds thumbnails to tile view, puts the venue top-right, and carries title / author / year / venue in both tile and list view. No tags on the cards — those are filters only."
+  variant="i"
+  yearPalette="amber"
+  name="Round 3"
+  eyebrow="Style directions · two themes, four year-colour schemes"
+  lede="E's structure on lighter stock with no texture, plus every content change you asked for: abstracts behind an expander, all authors listed, the whole card opening in a new tab, and venue casing that follows the data so acronyms stay capitalised while Preprint does not shout."
 >
   <div class="explorer">
+    <div
+      style="display:grid; gap:1rem; grid-template-columns:repeat(auto-fill,minmax(min(100%,17rem),1fr))"
+    >
+      <a href="/mockups/i" style="display:block; padding:1.1rem; background:var(--color-panel); border:1px solid var(--color-rule); text-decoration:none; color:inherit">
+        <p class="mock-eyebrow" style="margin-bottom:.35rem">Direction I</p>
+        <h2 style="margin:0; font-family:var(--font-display); font-size:1.1rem">Light index card</h2>
+        <p style="margin:.6rem 0 0; font-size:.8rem; line-height:1.55; color:var(--color-ink-muted)">
+          The consolidated candidate. Inter + Space Mono on warm-white stock, no texture,
+          highlighter on the year.
+        </p>
+      </a>
+      <a href="/mockups/j" style="display:block; padding:1.1rem; background:var(--color-panel); border:1px solid var(--color-rule); text-decoration:none; color:inherit">
+        <p class="mock-eyebrow" style="margin-bottom:.35rem">Direction J</p>
+        <h2 style="margin:0; font-family:var(--font-display); font-size:1.1rem">Personal site</h2>
+        <p style="margin:.6rem 0 0; font-size:.8rem; line-height:1.55; color:var(--color-ink-muted)">
+          Same structure in your own visual language — Roboto, white, black ink,
+          #0076df links, light display weights.
+        </p>
+      </a>
+    </div>
+
+    <h2 style="margin:2.5rem 0 .75rem; font-family:var(--font-display); font-size:1rem">Round 2 — superseded, kept for reference</h2>
     <div
       style="display:grid; gap:1rem; grid-template-columns:repeat(auto-fill,minmax(min(100%,15rem),1fr))"
     >
@@ -76,10 +98,11 @@ const ROUND_2 = [
     </div>
 
     <p class="round-note">
-      Each Round 2 page has a <strong>Texture</strong> control bottom-right — none / subtle / medium
-      / strong. Texture strength is the one thing that is hard to specify in the abstract, so dial it
-      on real content and tell me where it should sit. H starts at none deliberately, as the control:
-      it is there to test whether the stationery treatment is earning its keep.
+      <strong>Year colour.</strong> Both Round 3 pages carry a control bottom-right with four
+      schemes. <em>Amber ramp</em> and <em>Cool→warm</em> encode recency — older papers read pale or
+      cold, newer ones saturated or warm — so the colour carries information. <em>Marker pack</em> is
+      a box of highlighters: livelier, but the colours mean nothing. <em>Single</em> is the control.
+      Because the year is also written as text, none of these rely on colour alone to convey it.
     </p>
 
     <p class="round-note">

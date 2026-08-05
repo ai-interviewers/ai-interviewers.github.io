@@ -9,8 +9,8 @@ import CardHybrid from './CardHybrid.astro';
 
 interface Props {
   papers: Paper[];
-  /** a–d are Round 1; e–h are Round 2 and all share CardHybrid. */
-  variant: 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
+  /** a–d are Round 1; e–j share CardHybrid. */
+  variant: 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j';
   /** Direction C promotes the chart to the top as the primary navigation device. */
   chartPosition?: 'top' | 'side' | 'none';
   segmentBy?: 'autonomy' | 'type';
@@ -27,6 +27,8 @@ const Card = {
   f: CardHybrid,
   g: CardHybrid,
   h: CardHybrid,
+  i: CardHybrid,
+  j: CardHybrid,
 }[variant];
 
 const hiddenFacets = ['autonomy', 'modality', 'type', 'venuetype', 'domain'].filter(
@@ -47,15 +49,17 @@ const hiddenFacets = ['autonomy', 'modality', 'type', 'venuetype', 'domain'].fil
 
   <div class="explorer-body">
     {/*
-      On mobile the facet list (16 domains alone) would push every paper below the fold,
-      so the controls collapse into a drawer. Closed by default; desktop CSS forces the
-      body visible regardless of open state, so no JS is involved.
+      On mobile the facet list (16 domains alone) would push every paper below the fold, so
+      the controls collapse behind this button. Deliberately not a <details>: a closed
+      <details> gets `content-visibility: hidden` from the UA, which cannot be overridden
+      from the inside, so the desktop "force open" rule left the sidebar laid out but
+      unpainted. An explicit attribute toggle is predictable in both directions.
     */}
-    <details class="sidebar filter-drawer">
-      <summary class="drawer-summary">
+    <div class="sidebar filter-drawer">
+      <button type="button" class="drawer-summary" data-drawer-toggle aria-expanded="false">
         Search &amp; filters
         <span class="drawer-hint">{papers.length} papers</span>
-      </summary>
+      </button>
       <div class="drawer-body">
       <div class="control-block">
         <label class="control-label" for={`search-${variant}`}>Search</label>
@@ -104,7 +108,7 @@ const hiddenFacets = ['autonomy', 'modality', 'type', 'venuetype', 'domain'].fil
 
         {chartPosition === 'side' && <YearChart papers={papers} segmentBy={segmentBy} height={120} />}
       </div>
-    </details>
+    </div>
 
     <section class="results" data-results>
       <header class="results-head">
