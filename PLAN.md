@@ -267,7 +267,7 @@ Navigating Cognitive Load and Interviewer Agency*. It appears nowhere in arXiv, 
 search, and its subtitle terms are drawn from InterFlow's own abstract — likely a working title for
 that paper, which is already indexed here.
 
-### Phase 2 — Style exploration ← *your decision point*
+### Phase 2 — Style exploration ✅ **done** (J theme chosen, applied site-wide in Phase 3)
 Build the papers page four ways against the real data, all locally previewable at once:
 
 - **`/mockups/a` — Academic archive.** Serif headings, warm off-white paper tone, hairline rules,
@@ -471,12 +471,13 @@ GA4, sitemap, and `robots.txt` were already in place from Phase 0. Not done: per
 images and an RSS feed — neither was asked for and both are easy to add later without touching
 anything already built.
 
-### Phase 8 — Contribution infrastructure
-Issue templates for submission and correction. `CONTRIBUTING.md` documenting the schema and the
-vocabularies. Optionally a GitHub Action that converts a well-formed submission issue into a draft
-paper file as a PR — worth it around the point where submissions become regular, not before.
+### Phase 8 — Contribution infrastructure ✅ **done**
+Issue templates for submission and correction, and `CONTRIBUTING.md` documenting the schema and
+vocabularies, were built in Phase 0/1. Not done, and deliberately deferred: a GitHub Action that
+converts a well-formed submission issue into a draft paper PR — worth building once submissions
+become regular, not before.
 
-### Phase 9 — Polish
+### Phase 9 — Polish ← **current phase**
 Keyboard navigation and focus states, color contrast, mobile at 375px, Lighthouse pass, `<noscript>`
 behavior, 404 page.
 
