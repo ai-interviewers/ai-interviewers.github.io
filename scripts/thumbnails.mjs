@@ -26,7 +26,20 @@ const OUT_DIR = 'public/thumbnails';
 const CACHE_DIR = '.cache/pdfs';
 
 const DPI = 150;
-const TOP_FRACTION = 0.42; // How much of page 1 to keep — title block plus abstract head.
+
+/*
+ * The card displays thumbnails at a fixed aspect ratio (see PaperCard.astro's
+ * `.thumb { aspect-ratio: 71/29 }`) via object-fit:cover. Width is always the full
+ * (trimmed) page width — centred title text spans most of a paper's text column, so
+ * any horizontal cropping to chase a tighter aspect clips straight through title
+ * words (tried it: "InterPilot" became "rPilot"). Height is derived from that width to
+ * land on the card's exact aspect ratio, so cover has nothing left to crop — what's
+ * generated is exactly what's shown. This is the tightest crop obtainable without
+ * clipping full-width titles; it happens to land close to what the very first
+ * (accidentally too-loose) version showed after the browser's own crop, but it's now
+ * deliberate and consistent across page sizes rather than incidental.
+ */
+const DISPLAY_ASPECT = 71 / 29;
 
 /**
  * Trim this share off each side. arXiv stamps a rotated "arXiv:xxxx [cs.HC] date" in the
@@ -60,20 +73,19 @@ async function download(url, dest) {
   await writeFile(dest, Buffer.from(await res.arrayBuffer()));
 }
 
-/** Page 1 dimensions in points, so the crop is resolution independent. */
-async function pageSize(pdf) {
+/** Page 1 width in points, so the crop is resolution independent. */
+async function pageWidth(pdf) {
   const { stdout } = await run('pdfinfo', [pdf]);
   const m = stdout.match(/Page size:\s+([\d.]+) x ([\d.]+)/);
   if (!m) throw new Error('could not read page size');
-  return { width: Number(m[1]), height: Number(m[2]) };
+  return Number(m[1]);
 }
 
 async function renderTop(pdf, outBase) {
-  const { width, height } = await pageSize(pdf);
-  const pxWidth = Math.round((width * DPI) / 72);
-  const pxHeight = Math.round(((height * DPI) / 72) * TOP_FRACTION);
-  const xOffset = Math.round(pxWidth * SIDE_TRIM);
-  const cropWidth = pxWidth - xOffset * 2;
+  const pxPageWidth = Math.round(((await pageWidth(pdf)) * DPI) / 72);
+  const xOffset = Math.round(pxPageWidth * SIDE_TRIM);
+  const cropWidth = pxPageWidth - xOffset * 2;
+  const pxHeight = Math.round(cropWidth / DISPLAY_ASPECT);
 
   await run('pdftoppm', [
     '-f', '1', '-l', '1',
