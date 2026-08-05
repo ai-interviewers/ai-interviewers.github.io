@@ -26,6 +26,18 @@ That fills title, authors, date, url, arXiv id, and the abstract, and leaves eve
 field blank. It also works from a file of titles (`--titles titles.txt`) and reports low-confidence
 matches for you to verify by hand.
 
+## ⚠️ Classification is currently unconfirmed
+
+Every paper's `autonomy`, `modality`, `paperType`, and `domains` were assigned by a model from the
+paper's abstract, not by a human reading the paper. Each file carries a `MODEL-ASSIGNED and
+UNCONFIRMED` comment above those fields, and all four remain listed in `needsReview`.
+
+Treat them as a starting point. When you verify a field against the paper itself, remove that field
+name from `needsReview` — that is the signal a human has confirmed it. `npm run review` reports what
+is still outstanding. Several files also carry a `# NOTE:` line explaining a debatable call.
+
+This should be worked through before `PUBLISH=true`.
+
 ## Vocabularies
 
 Defined in `src/content.config.ts`. The build fails on unlisted values, which is deliberate — it

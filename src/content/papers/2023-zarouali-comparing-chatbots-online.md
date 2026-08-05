@@ -10,20 +10,22 @@ pdfUrl:
 venue: "Communication Methods and Measures"
 venueType: journal
 
-# Classification left blank on purpose — see `npm run review`.
-autonomy:
-modality:
-paperType: []
-domains: []
+# Classification below is MODEL-ASSIGNED and UNCONFIRMED — read the paper and verify,
+# then remove the verified field names from needsReview. See `npm run review`.
+# NOTE: Comparative mode study (chatbot vs web survey); no system contributed.
+autonomy: autonomous
+modality: text
+paperType: ["evaluation-benchmark"]
+domains: ["surveys", "communication research"]
 
 code_url:
 dataset_url:
 thumbnail:
 bibtex:
 
-needsReview: ["autonomy", "modality", "paperType", "domains", "abstract", "venueType"]
-abstractIsSummary: false
+needsReview: ["autonomy", "modality", "paperType", "domains", "venueType"]
+abstractIsSummary: true
 draft: false
 ---
 
-<!-- Crossref has no abstract on deposit for this paper. Add it by hand from the publisher page, or write a summary and set abstractIsSummary: true. -->
+Compares a traditional web-based survey against a conversational, chatbot-based survey delivered through an instant-messaging app, looking at response characteristics, data quality, and how respondents evaluated each mode. A longitudinal design tracked how those characteristics changed over two weeks. Web surveys generally produced higher data quality and more favourable user evaluations, leading the authors to caution that the added interactivity of chatbots does not by itself improve data quality.

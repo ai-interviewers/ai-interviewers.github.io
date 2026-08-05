@@ -10,11 +10,13 @@ pdfUrl:
 venue: "Proceedings of the ACM on Human-Computer Interaction"
 venueType: journal
 
-# Classification left blank on purpose — see `npm run review`.
-autonomy:
-modality:
-paperType: []
-domains: []
+# Classification below is MODEL-ASSIGNED and UNCONFIRMED — read the paper and verify,
+# then remove the verified field names from needsReview. See `npm run review`.
+# NOTE: Formative interview study (N=16) about expectations; no system built, so modality does not apply.
+autonomy: ai-assisted
+modality: not-applicable
+paperType: ["exploratory-position"]
+domains: ["hci", "qualitative research"]
 
 code_url:
 dataset_url:

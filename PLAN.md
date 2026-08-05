@@ -211,14 +211,56 @@ exits non-zero so a partial run cannot be mistaken for a complete one.
 Fuzzy-match confidence scoring also earned its keep: one title matched an unrelated paper
 ("Pallvi Arora Discusses and Defines Thematic Analysis…") at 0.27 and was correctly withheld.
 
+#### Phase 1b — classification and abstract recovery ✅ **done**
+
+**23 papers** (InterPilot added at your request). Every abstract recovered, every classification field
+filled — but **all classification is model-assigned and unconfirmed**, and marked as such in three
+places: a `MODEL-ASSIGNED and UNCONFIRMED` comment in each file, all four fields retained in
+`needsReview`, and a warning section in `CONTRIBUTING.md`. Files with debatable calls carry a
+`# NOTE:` line giving the reasoning.
+
+Abstract recovery, since Crossref had 5 missing:
+
+- **2 had arXiv versions** Crossref didn't link — *If I Hear You Correctly* (2002.01862) and
+  *InterPilot* (2602.20891). Adding the arXiv ids also unlocked their thumbnails.
+- **1 came from the ACL Anthology** — LM-Interview (open access).
+- **1 was pointing at the wrong version entirely.** Crossref matched the *CrimRxiv preprint* of the
+  child-interviewing study; the version of record is **PLOS ONE** (CC BY, 2025-02-28), with a fuller
+  author list. Entry rewritten to the published version. Worth remembering that Crossref's best match
+  is not always the version of record.
+- **1 was left as our own summary** — the Zarouali paper is Taylor & Francis, which restricts abstract
+  reuse, so `abstractIsSummary: true` and the body is a paraphrase. This is the copyright posture
+  described in §6 actually being exercised.
+
+Current distributions:
+
+| Field | Values |
+|---|---|
+| `autonomy` | 19 autonomous, 4 ai-assisted |
+| `modality` | 19 text, 4 not-applicable |
+| `paperType` | 16 new-system, 5 evaluation-benchmark, 2 exploratory-position |
+| `domains` | 16 tags; top: hci (10), qualitative research (9), surveys (6) |
+
+**Two things this reveals about the metadata design**, both worth deciding on before Phase 3:
+
+1. **No paper in the collection is voice or multimodal.** The `modality` facet you specified —
+   text / voice / both — currently has exactly one populated value. As a filter it does nothing yet.
+2. **`modality` is currently redundant with `autonomy`**: all 4 `not-applicable` modalities are
+   exactly the 4 `ai-assisted` papers, because a tool that assists a human interviewer has no
+   modality of its own. The two facets carry the same information at present.
+
+Neither is a reason to drop the field — voice interviewers plainly exist and will appear as the list
+grows — but the papers page should probably hide a facet that has only one distinct value rather than
+render a dead control.
+
 #### Outstanding data work
 
 | Item | Count | Notes |
 |---|---|---|
-| Classification blank | 22/22 | `autonomy`, `modality`, `paperType`, `domains` — run `npm run review` |
-| Abstract missing | 5 | Crossref has none on deposit; needs the publisher page |
-| Thumbnail missing | 7 | No openly reachable PDF; falls back to a typographic card |
-| Venue unverified | 15 | arXiv entries default to `preprint`; several are published |
+| Classification unconfirmed | 23/23 | Model-assigned; verify and prune `needsReview` |
+| Thumbnail missing | 5 | No openly reachable PDF; typographic-card fallback |
+| Venue unverified | 15 | arXiv entries default to `preprint`; several are published (e.g. InterFlow is CHI 2026) |
+| Abstract is a paraphrase | 1 | Zarouali — publisher restricts abstract reuse |
 
 Dropped at your direction: *Designing Real-Time AI Assistance for Semi-Structured Interviews:
 Navigating Cognitive Load and Interviewer Agency*. It appears nowhere in arXiv, Crossref, or web

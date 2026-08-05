@@ -9,11 +9,13 @@ arxiv: "2508.21184"
 venue:
 venueType: preprint
 
-# Classification left blank on purpose — see `npm run review`.
-autonomy:
-modality:
-paperType: []
-domains: []
+# Classification below is MODEL-ASSIGNED and UNCONFIRMED — read the paper and verify,
+# then remove the verified field names from needsReview. See `npm run review`.
+# NOTE: General information-gathering method (20 Questions, preference inference) rather than qualitative interviewing — consider whether it belongs in scope.
+autonomy: autonomous
+modality: text
+paperType: ["new-system"]
+domains: ["nlp methods"]
 
 code_url:
 dataset_url:

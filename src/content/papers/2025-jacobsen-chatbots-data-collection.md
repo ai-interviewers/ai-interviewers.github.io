@@ -10,11 +10,13 @@ doi: "10.1145/3706598.3714128"
 venue:
 venueType: preprint
 
-# Classification left blank on purpose — see `npm run review`.
-autonomy:
-modality:
-paperType: []
-domains: []
+# Classification below is MODEL-ASSIGNED and UNCONFIRMED — read the paper and verify,
+# then remove the verified field names from needsReview. See `npm run review`.
+# NOTE: Compares four theory-based probe types; the contribution is the comparison.
+autonomy: autonomous
+modality: text
+paperType: ["evaluation-benchmark"]
+domains: ["surveys", "hci"]
 
 code_url:
 dataset_url:

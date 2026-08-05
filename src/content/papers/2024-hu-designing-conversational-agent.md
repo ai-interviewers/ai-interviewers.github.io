@@ -10,11 +10,12 @@ pdfUrl:
 venue: "Proceedings of the ACM on Human-Computer Interaction"
 venueType: journal
 
-# Classification left blank on purpose — see `npm run review`.
-autonomy:
-modality:
-paperType: []
-domains: []
+# Classification below is MODEL-ASSIGNED and UNCONFIRMED — read the paper and verify,
+# then remove the verified field names from needsReview. See `npm run review`.
+autonomy: autonomous
+modality: text
+paperType: ["new-system"]
+domains: ["hci", "qualitative research"]
 
 code_url:
 dataset_url:

@@ -10,11 +10,12 @@ doi: "10.1145/3757586"
 venue:
 venueType: preprint
 
-# Classification left blank on purpose — see `npm run review`.
-autonomy:
-modality:
-paperType: []
-domains: []
+# Classification below is MODEL-ASSIGNED and UNCONFIRMED — read the paper and verify,
+# then remove the verified field names from needsReview. See `npm run review`.
+autonomy: autonomous
+modality: text
+paperType: ["new-system"]
+domains: ["surveys", "ux research"]
 
 code_url:
 dataset_url:

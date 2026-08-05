@@ -9,11 +9,13 @@ arxiv: "2410.01824"
 venue:
 venueType: preprint
 
-# Classification left blank on purpose — see `npm run review`.
-autonomy:
-modality:
-paperType: []
-domains: []
+# Classification below is MODEL-ASSIGNED and UNCONFIRMED — read the paper and verify,
+# then remove the verified field names from needsReview. See `npm run review`.
+# NOTE: Assesses AI vs human interviewers under identical questionnaires; contributes no system.
+autonomy: autonomous
+modality: text
+paperType: ["evaluation-benchmark"]
+domains: ["surveys", "political science"]
 
 code_url:
 dataset_url:
