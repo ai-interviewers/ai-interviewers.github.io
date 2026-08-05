@@ -185,12 +185,45 @@ Two things worth recording, because both were surprises:
    `build_type: workflow`, so only the gated workflow can deploy. Worth knowing that creating this
    repo at all was very nearly a publish event.
 
-### Phase 1 — Data model and seed
-Write `content.config.ts`. Take your title list, research each paper, and produce one Markdown file
-per paper with factual fields filled and classification fields blank plus `needs_review`. Add
-`npm run tags` and a validation script.
+### Phase 1 — Data model and seed ✅ **done**
 
-Deliverable: populated `src/content/papers/`, build fails loudly on bad data.
+**22 papers** seeded, spanning 2019-05 to 2026-08. 15 preprints, 5 journal, 2 conference.
+15 thumbnails generated (540 KB total).
+
+Two sources were needed, not one:
+
+- **arXiv** (15 papers) — has abstracts, but only indexes preprints.
+- **Crossref** (7 papers) — covers the ACM/CHI/CSCW and journal venues arXiv does not, with
+  excellent venue and DOI data and no meaningful rate limit. Deposits abstracts only sometimes.
+
+Semantic Scholar and OpenAlex were both tried first and rejected: S2's unauthenticated tier
+rate-limits almost immediately, and OpenAlex anonymous search was returning
+`"Search temporarily unavailable"` — which my throwaway test script initially misread as
+"no such paper", the same trap described below.
+
+**A defect worth recording.** The first real run of `fetch-arxiv.mjs` reported 8 papers as
+"not on arXiv". They were actually HTTP 429s. Re-running after adding backoff found **5 of those 8
+on arXiv after all** — so the original output would have sent five papers to manual entry
+unnecessarily, and nothing in the summary would have hinted at it. Rate-limit and transport failures
+are now tracked separately from genuine absence, retried with exponential backoff, and the script
+exits non-zero so a partial run cannot be mistaken for a complete one.
+
+Fuzzy-match confidence scoring also earned its keep: one title matched an unrelated paper
+("Pallvi Arora Discusses and Defines Thematic Analysis…") at 0.27 and was correctly withheld.
+
+#### Outstanding data work
+
+| Item | Count | Notes |
+|---|---|---|
+| Classification blank | 22/22 | `autonomy`, `modality`, `paperType`, `domains` — run `npm run review` |
+| Abstract missing | 5 | Crossref has none on deposit; needs the publisher page |
+| Thumbnail missing | 7 | No openly reachable PDF; falls back to a typographic card |
+| Venue unverified | 15 | arXiv entries default to `preprint`; several are published |
+
+Dropped at your direction: *Designing Real-Time AI Assistance for Semi-Structured Interviews:
+Navigating Cognitive Load and Interviewer Agency*. It appears nowhere in arXiv, Crossref, or web
+search, and its subtitle terms are drawn from InterFlow's own abstract — likely a working title for
+that paper, which is already indexed here.
 
 ### Phase 2 — Style exploration ← *your decision point*
 Build the papers page four ways against the real data, all locally previewable at once:
