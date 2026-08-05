@@ -4,8 +4,8 @@
  *   I · Light index card — the consolidated candidate
  *   J · Personal site    — matched to jonathanivey.github.io
  *
- * Both carry a year-highlight palette switcher, since the year swipe is the one place
- * colour has to be chosen and four schemes read very differently on real data.
+ * The year is no longer highlighted; domain tags on each card carry the highlighter
+ * instead, coloured per domain by lib/papers.ts.
  */
 
 /* =========================================================
@@ -49,9 +49,14 @@ body[data-variant='j'] {
   --color-accent-soft: #f0f7ff;
   --color-highlight: #ffe066;
 
+  /*
+   * Roboto only — that is the whole typographic system on jonathanivey.github.io, so the
+   * "mono" slot is Roboto too. Monospace metadata was a Round 1/2 idea that does not belong
+   * in this theme; tabular numerals give the alignment the mono face was providing.
+   */
   --font-display: 'Roboto Variable', Roboto, ui-sans-serif, sans-serif;
   --font-body: 'Roboto Variable', Roboto, ui-sans-serif, sans-serif;
-  --font-mono: 'Roboto Mono', ui-monospace, monospace;
+  --font-mono: 'Roboto Variable', Roboto, ui-sans-serif, sans-serif;
 
   --seg-1: #0076df;
   --seg-2: #5fa8ec;
@@ -82,56 +87,64 @@ body[data-variant='j'] .card-h {
   border-color: var(--color-rule);
 }
 
-/* =========================================================
-   Year-highlight palettes
-   Applied via --yr-<year> on the card; unknown years fall back to
-   --color-highlight, so the scheme never breaks as the list grows.
-   ========================================================= */
-
-/* A · Marker pack — a box of highlighters. Playful, encodes nothing. */
-[data-yearpalette='marker'] {
-  --yr-2019: #ffe066;
-  --yr-2020: #a8ecd0;
-  --yr-2021: #ffc2d4;
-  --yr-2022: #b8e0ff;
-  --yr-2023: #d9f18f;
-  --yr-2024: #e0c3fc;
-  --yr-2025: #ffd0a1;
-  --yr-2026: #9be7de;
+/*
+ * No small-caps anywhere. Every label that Rounds 1–2 set in letterspaced uppercase mono
+ * is returned to sentence case in Roboto, which is how the personal site sets UI text.
+ */
+body[data-variant='j'] .mock-eyebrow,
+body[data-variant='j'] .mock-nav a,
+body[data-variant='j'] .mock-nav-sep,
+body[data-variant='j'] .control-label,
+body[data-variant='j'] .drawer-summary,
+body[data-variant='j'] .view-toggle button,
+body[data-variant='j'] .chart-hint,
+body[data-variant='j'] .chart-year,
+body[data-variant='j'] .palette-bar,
+body[data-variant='j'] .palette-bar span,
+body[data-variant='j'] .palette-bar button,
+body[data-variant='j'] .card-h .abstract-toggle summary,
+body[data-variant='j'] .card-h .yr,
+body[data-variant='j'] .card-h .venue {
+  letter-spacing: normal;
+  text-transform: none;
 }
 
-/* B · Amber ramp — one hue, pale for older, saturated for newer. Encodes recency. */
-[data-yearpalette='amber'] {
-  --yr-2019: #fdf3cf;
-  --yr-2020: #fcecb8;
-  --yr-2021: #fbe4a0;
-  --yr-2022: #fada88;
-  --yr-2023: #f9d070;
-  --yr-2024: #f8c455;
-  --yr-2025: #f7b73a;
-  --yr-2026: #f5a623;
+/* Sentence case at these sizes needs slightly more weight to hold as a label. */
+body[data-variant='j'] .control-label {
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--color-ink-muted);
 }
 
-/* C · Cool to warm — the strongest recency signal; old reads cold, new reads hot. */
-[data-yearpalette='spectrum'] {
-  --yr-2019: #cfe0f5;
-  --yr-2020: #d5e7ef;
-  --yr-2021: #dcefe0;
-  --yr-2022: #e6f2c9;
-  --yr-2023: #f1f3ab;
-  --yr-2024: #fbee8a;
-  --yr-2025: #ffe066;
-  --yr-2026: #ffc53d;
+body[data-variant='j'] .mock-eyebrow {
+  font-size: 0.82rem;
 }
 
-/* D · Single yellow — the control. One highlighter, no year encoding. */
-[data-yearpalette='single'] {
-  --yr-2019: #ffe066;
-  --yr-2020: #ffe066;
-  --yr-2021: #ffe066;
-  --yr-2022: #ffe066;
-  --yr-2023: #ffe066;
-  --yr-2024: #ffe066;
-  --yr-2025: #ffe066;
-  --yr-2026: #ffe066;
+body[data-variant='j'] .card-h .yr,
+body[data-variant='j'] .card-h .venue {
+  font-size: 0.74rem;
 }
+
+body[data-variant='j'] .card-h .yr {
+  font-weight: 500;
+  color: var(--color-ink-muted);
+}
+
+body[data-variant='j'] .card-h .abstract-toggle summary {
+  font-size: 0.74rem;
+}
+
+body[data-variant='j'] .view-toggle button,
+body[data-variant='j'] .mock-nav a {
+  font-size: 0.78rem;
+}
+
+body[data-variant='j'] .facet-count {
+  font-size: 0.74rem;
+}
+
+/* Domain tags: Roboto, sentence case, and the site's link blue on hover of a card. */
+body[data-variant='j'] .card-h .domain {
+  font-size: 0.72rem;
+}
+

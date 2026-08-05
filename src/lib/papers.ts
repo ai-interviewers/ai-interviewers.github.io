@@ -66,6 +66,45 @@ export const firstAuthor = (p: Paper) =>
 /** Unconfirmed fields render differently — the dataset's provenance is visible, not hidden. */
 export const isUnconfirmed = (p: Paper, field: string) => p.data.needsReview.includes(field);
 
+/*
+ * Highlighter colour per domain tag. Curated for the domains currently in the
+ * collection, with a deterministic hash fallback so a newly added domain gets a stable
+ * colour without anyone editing this file. All values are pale enough to carry the
+ * body ink on top, and the tag always shows its name in text — the colour is a second
+ * channel, never the only one.
+ */
+const DOMAIN_COLORS: Record<string, string> = {
+  hci: '#ffe066',
+  'qualitative research': '#a8ecd0',
+  surveys: '#b8e0ff',
+  'social science': '#ffc2d4',
+  'nlp methods': '#d9f18f',
+  psychology: '#e0c3fc',
+  'ux research': '#ffd0a1',
+  education: '#9be7de',
+  health: '#ffb3b3',
+  'political science': '#c9d6ff',
+  'public policy': '#ffe0b3',
+  'public opinion': '#d4f0a0',
+  'communication research': '#f0c2e8',
+  'forensic interviewing': '#cfdce4',
+  hiring: '#ffdf9e',
+  autobiography: '#e8d5b7',
+};
+
+export function domainColor(domain: string): string {
+  const known = DOMAIN_COLORS[domain];
+  if (known) return known;
+
+  // FNV-1a, so the colour is stable across builds rather than depending on insertion order.
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < domain.length; i++) {
+    hash ^= domain.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+  return `hsl(${hash % 360} 85% 80%)`;
+}
+
 export interface Facet {
   key: string;
   legend: string;

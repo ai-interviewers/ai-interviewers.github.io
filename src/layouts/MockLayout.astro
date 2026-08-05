@@ -19,8 +19,6 @@ interface Props {
   palette?: string;
   /** Round 2 only. Starting texture strength; adjustable on the page. */
   texture?: 'none' | 'subtle' | 'medium' | 'strong';
-  /** Round 3 only. Starting year-highlight scheme; adjustable on the page. */
-  yearPalette?: 'amber' | 'spectrum' | 'marker' | 'single';
 }
 
 const {
@@ -30,7 +28,6 @@ const {
   lede,
   palette,
   texture = 'medium',
-  yearPalette = 'amber',
 } = Astro.props;
 
 const ROUND_3 = [
@@ -58,12 +55,6 @@ const round = ROUND_3.some((d) => d.id === variant)
     ? '2'
     : '1';
 
-const YEAR_PALETTES = [
-  { id: 'amber', label: 'Amber ramp' },
-  { id: 'spectrum', label: 'Cool→warm' },
-  { id: 'marker', label: 'Marker pack' },
-  { id: 'single', label: 'Single' },
-];
 ---
 
 <!doctype html>
@@ -79,7 +70,6 @@ const YEAR_PALETTES = [
     data-palette={palette}
     data-round={round}
     data-texture={round === '2' ? texture : undefined}
-    data-yearpalette={round === '3' ? yearPalette : undefined}
   >
     <div class="mock-page">
       <header class="mock-header">
@@ -123,22 +113,6 @@ const YEAR_PALETTES = [
         )
       }
 
-      {
-        round === '3' && (
-          <div class="palette-bar" role="group" aria-label="Year highlight palette">
-            <span>Year colour</span>
-            {YEAR_PALETTES.map((p) => (
-              <button
-                type="button"
-                data-yearpalette-btn={p.id}
-                aria-pressed={String(p.id === yearPalette)}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-        )
-      }
     </div>
 
     {
@@ -156,19 +130,5 @@ const YEAR_PALETTES = [
       )
     }
 
-    {
-      round === '3' && (
-        <script>
-          {/* Mockup-only control; swaps the year-highlight scheme. */}
-          const buttons = document.querySelectorAll('[data-yearpalette-btn]');
-          for (const btn of buttons) {
-            btn.addEventListener('click', () => {
-              document.body.dataset.yearpalette = btn.dataset.yearpaletteBtn;
-              for (const b of buttons) b.setAttribute('aria-pressed', String(b === btn));
-            });
-          }
-        </script>
-      )
-    }
   </body>
 </html>

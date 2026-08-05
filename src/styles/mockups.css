@@ -154,6 +154,14 @@
   font-family: var(--font-body);
 }
 
+/* Form controls do not inherit font-family, so they fall back to Arial without this. */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
 [data-variant='d'] .mock-page {
   background-image:
     linear-gradient(90deg, rgba(128, 128, 128, 0.07) 1px, transparent 1px),

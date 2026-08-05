@@ -4,12 +4,13 @@
  *
  *   · Title, all authors, year, and venue are always present, in tile and list view.
  *   · Venue top-right, as in direction D's slug line.
- *   · No tags or classification badges — those live in the filters only.
+ *   · Domain tags beside the abstract expander, highlighter-coloured per domain.
+ *     Autonomy, modality, and paper type stay in the filters only.
  *   · Thumbnails in tile view.
  *   · Abstract hidden behind an expander rather than shown by default.
  *   · The whole card opens the paper in a new tab.
  */
-import { dataAttrs, shortVenue, year } from '../../lib/papers';
+import { dataAttrs, domainColor, shortVenue, year } from '../../lib/papers';
 import type { Paper } from '../../lib/papers';
 
 const { paper } = Astro.props as { paper: Paper };
@@ -25,11 +26,7 @@ const initials = d.title
   .join('');
 ---
 
-<article
-  class="card-h"
-  {...dataAttrs(paper)}
-  style={`--yr-color: var(--yr-${year(paper)}, var(--color-highlight))`}
->
+<article class="card-h" {...dataAttrs(paper)}>
   <a class="thumb" href={d.url} target="_blank" rel="noopener" aria-hidden="true" tabindex="-1">
     {
       d.thumbnail ? (
@@ -52,14 +49,39 @@ const initials = d.title
 
     <p class="authors" title={authors}>{authors}</p>
 
-    {
-      abstract && (
-        <details class="abstract-toggle">
-          <summary>Abstract</summary>
-          <p class="abstract">{abstract}</p>
-        </details>
-      )
-    }
+    {/*
+      Abstract expander and the domain tags share a row. Domains are the one piece of
+      classification that earns a place on the card — they say what the paper is about,
+      where autonomy and paper type are better left to the filters.
+    */}
+    <div class="card-foot">
+      {
+        abstract && (
+          <details class="abstract-toggle">
+            <summary>Abstract</summary>
+          </details>
+        )
+      }
+
+      {
+        d.domains.length > 0 && (
+          <ul class="domains">
+            {d.domains.map((domain) => (
+              <li class="domain" style={`--tag: ${domainColor(domain)}`}>
+                {domain}
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+
+    {/*
+      The abstract lives outside the footer row so expanding it never displaces the tags.
+      Revealed by :has() rather than by nesting inside <details>, which keeps it working
+      without JavaScript and keeps the text in the HTML for search engines either way.
+    */}
+    {abstract && <p class="abstract">{abstract}</p>}
   </div>
 </article>
 
@@ -125,11 +147,8 @@ const initials = d.title
     letter-spacing: 0.04em;
   }
 
-  /* Highlighter swipe on the year; the colour can vary by year. */
   .yr {
     flex: none;
-    padding: 0.05rem 0.32rem;
-    background: var(--yr-color);
     font-weight: 700;
     color: var(--color-ink);
   }
@@ -178,10 +197,38 @@ const initials = d.title
     color: var(--color-ink-muted);
   }
 
+  /* The expander sits on one row with the domain tags to its right, in both states. */
+  .card-foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 0.7rem;
+  }
+
   .abstract-toggle {
     position: relative;
     z-index: 2;
-    margin-top: 0.6rem;
+    flex: 0 0 auto;
+  }
+
+  .domains {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  /* Highlighter swipe, colour keyed to the domain. Name is always present as text. */
+  .domain {
+    padding: 0.1rem 0.4rem;
+    background: var(--tag);
+    font-size: 0.7rem;
+    line-height: 1.35;
+    color: var(--color-ink);
   }
 
   .abstract-toggle summary {
@@ -219,10 +266,26 @@ const initials = d.title
   }
 
   .abstract {
-    margin: 0.55rem 0 0;
+    display: none;
+    margin: 0.7rem 0 0;
     font-size: 0.8rem;
     line-height: 1.6;
     color: var(--color-ink-muted);
+  }
+
+  .body:has(.abstract-toggle[open]) .abstract {
+    display: block;
+  }
+
+  /* Without :has(), show abstracts rather than making them unreachable. */
+  @supports not selector(:has(*)) {
+    .abstract {
+      display: block;
+    }
+
+    .abstract-toggle {
+      display: none;
+    }
   }
 
   /* ---------- list view: a ledger row, still carrying all four fields ---------- */
@@ -239,7 +302,8 @@ const initials = d.title
   }
 
   :global([data-view='list']) .thumb,
-  :global([data-view='list']) .abstract-toggle {
+  :global([data-view='list']) .card-foot,
+  :global([data-view='list']) .abstract {
     display: none;
   }
 
