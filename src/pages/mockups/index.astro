@@ -1,0 +1,45 @@
+---
+import MockLayout from '../../layouts/MockLayout.astro';
+import { getPapers } from '../../lib/papers';
+
+const papers = await getPapers();
+const unconfirmed = papers.filter((p) => p.data.needsReview.length > 0).length;
+const withThumb = papers.filter((p) => p.data.thumbnail).length;
+
+const DIRECTIONS = [
+  { id: 'a', name: 'Academic archive', note: 'Serif, warm paper, hairline rules, citation-forward. Dense single column.' },
+  { id: 'b', name: 'Modern research lab', note: 'Sans, whitespace, shadowed cards with thumbnails, pill chips.' },
+  { id: 'c', name: 'Data-forward', note: 'Chart-led navigation, compact rows, mono metadata, short codes.' },
+  { id: 'd', name: 'Transcript / stationery', note: 'Transcript slips, dashed form fields, crop marks, hatched tags. Three palettes to compare.' },
+];
+---
+
+<MockLayout
+  variant="a"
+  name="Style directions"
+  eyebrow="Phase 2 · pick one"
+  lede="All four render the same 23 papers through the same Explorer markup and the same filter engine. They differ in a token layer — fonts, colour, spacing, radii — plus card composition. Try the filters, the search, and the tile/list toggle in each, and check them at phone width."
+>
+  <div class="explorer">
+    <div style="display:grid; gap:1rem; grid-template-columns:repeat(auto-fill,minmax(min(100%,17rem),1fr))">
+      {
+        DIRECTIONS.map((d) => (
+          <a
+            href={`/mockups/${d.id}`}
+            style="display:block; padding:1.25rem; background:var(--color-panel); border:1px solid var(--color-rule); text-decoration:none; color:inherit"
+          >
+            <p class="mock-eyebrow" style="margin-bottom:.4rem">Direction {d.id.toUpperCase()}</p>
+            <h2 style="margin:0; font-family:var(--font-display); font-size:1.15rem">{d.name}</h2>
+            <p style="margin:.5rem 0 0; font-size:.85rem; line-height:1.55; color:var(--color-ink-muted)">{d.note}</p>
+          </a>
+        ))
+      }
+    </div>
+
+    <p class="facet-note" style="margin-top:2rem">
+      Data state: {papers.length} papers · {withThumb} with PDF thumbnails · {unconfirmed} with
+      unconfirmed classification. Every direction has to look finished while the dataset is still
+      being verified, which is the main constraint being tested here.
+    </p>
+  </div>
+</MockLayout>

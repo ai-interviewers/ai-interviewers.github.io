@@ -1,0 +1,197 @@
+---
+// Direction C — Data-forward. Reads like a dataset explorer: compact rows, monospace
+// metadata, tabular alignment, high contrast, minimal ornament.
+import { dataAttrs, firstAuthor, isUnconfirmed, label, shortVenue, year } from '../../lib/papers';
+import type { Paper } from '../../lib/papers';
+
+const { paper } = Astro.props as { paper: Paper };
+const d = paper.data;
+const abstract = paper.body ?? '';
+
+const AUTONOMY_CODE: Record<string, string> = {
+  autonomous: 'AUTO',
+  'ai-assisted': 'ASST',
+  both: 'BOTH',
+  'not-applicable': '—',
+};
+const TYPE_CODE: Record<string, string> = {
+  'new-system': 'SYS',
+  'evaluation-benchmark': 'EVAL',
+  'exploratory-position': 'EXPL',
+  survey: 'SURV',
+  dataset: 'DATA',
+};
+---
+
+<article class="card-c" {...dataAttrs(paper)}>
+  <span class="yr">{year(paper)}</span>
+
+  <span class="codes">
+    {
+      d.autonomy && (
+        <span class="code" class:list={[{ unconfirmed: isUnconfirmed(paper, 'autonomy') }]}>
+          {AUTONOMY_CODE[d.autonomy]}
+        </span>
+      )
+    }
+    {
+      d.paperType.map((t) => (
+        <span class="code alt" class:list={[{ unconfirmed: isUnconfirmed(paper, 'paperType') }]}>
+          {TYPE_CODE[t]}
+        </span>
+      ))
+    }
+  </span>
+
+  <div class="main">
+    <h3 class="title">
+      <a href={d.url} target="_blank" rel="noopener">{d.title}</a>
+    </h3>
+    <p class="sub">
+      <span>{firstAuthor(paper)}</span>
+      <span class="sep">/</span>
+      <span class="venue">{shortVenue(paper)}</span>
+    </p>
+    <p class="abstract">{abstract.slice(0, 200)}{abstract.length > 200 ? '…' : ''}</p>
+    <p class="domains">
+      {d.domains.map((t) => <span class="dom">{t}</span>)}
+    </p>
+  </div>
+</article>
+
+<style>
+  .card-c {
+    display: grid;
+    grid-template-columns: 3.4rem 5.5rem 1fr;
+    gap: 0 0.9rem;
+    align-items: start;
+    padding: 0.75rem 0.6rem;
+    border-bottom: 1px solid var(--color-rule);
+  }
+
+  .card-c:hover {
+    background: color-mix(in srgb, var(--color-accent) 5%, transparent);
+  }
+
+  .yr,
+  .code,
+  .dom {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .yr {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--color-ink-muted);
+  }
+
+  .codes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .code {
+    padding: 0.05rem 0.3rem;
+    background: var(--color-accent);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--color-panel);
+  }
+
+  .code.alt {
+    background: transparent;
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .code.unconfirmed {
+    border: 1px dashed currentcolor;
+    background: transparent;
+    color: var(--color-ink-muted);
+  }
+
+  .main {
+    min-width: 0;
+  }
+
+  .title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .title a {
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+
+  .title a:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .sub {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.2rem 0 0;
+    font-size: 0.75rem;
+    color: var(--color-ink-muted);
+  }
+
+  .sep {
+    opacity: 0.4;
+  }
+
+  .venue {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+  }
+
+  .abstract {
+    margin: 0.45rem 0 0;
+    max-width: 80ch;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: var(--color-ink-muted);
+  }
+
+  .domains {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.45rem 0 0;
+  }
+
+  .dom {
+    font-size: 0.65rem;
+    color: var(--color-ink-muted);
+  }
+
+  .dom::before {
+    content: '#';
+    opacity: 0.45;
+  }
+
+  /* Tile view: the grid becomes a real grid of compact panels. */
+  :global([data-view='tile']) .card-c {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    padding: 0.85rem;
+    border: 1px solid var(--color-rule);
+    border-bottom: 1px solid var(--color-rule);
+  }
+
+  :global([data-view='tile']) .yr {
+    order: -1;
+  }
+
+  :global([data-view='list']) .abstract {
+    display: none;
+  }
+</style>

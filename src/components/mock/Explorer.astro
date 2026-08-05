@@ -1,0 +1,123 @@
+---
+import { buildFacets, label, type Paper } from '../../lib/papers';
+import YearChart from '../YearChart.astro';
+import CardA from './CardA.astro';
+import CardB from './CardB.astro';
+import CardC from './CardC.astro';
+import CardD from './CardD.astro';
+
+interface Props {
+  papers: Paper[];
+  variant: 'a' | 'b' | 'c' | 'd';
+  /** Direction C promotes the chart to the top as the primary navigation device. */
+  chartPosition?: 'top' | 'side' | 'none';
+  segmentBy?: 'autonomy' | 'type';
+}
+
+const { papers, variant, chartPosition = 'side', segmentBy = 'autonomy' } = Astro.props;
+const facets = buildFacets(papers);
+const Card = { a: CardA, b: CardB, c: CardC, d: CardD }[variant];
+
+const hiddenFacets = ['autonomy', 'modality', 'type', 'venuetype', 'domain'].filter(
+  (k) => !facets.some((f) => f.key === k),
+);
+---
+
+<div class="explorer" data-explorer data-view="tile">
+  {
+    chartPosition === 'top' && (
+      <section class="chart-band">
+        <h2 class="band-title">Papers per year</h2>
+        <YearChart papers={papers} segmentBy={segmentBy} height={190} />
+        <p class="chart-hint">Click a segment to filter.</p>
+      </section>
+    )
+  }
+
+  <div class="explorer-body">
+    {/*
+      On mobile the facet list (16 domains alone) would push every paper below the fold,
+      so the controls collapse into a drawer. Closed by default; desktop CSS forces the
+      body visible regardless of open state, so no JS is involved.
+    */}
+    <details class="sidebar filter-drawer">
+      <summary class="drawer-summary">
+        Search &amp; filters
+        <span class="drawer-hint">{papers.length} papers</span>
+      </summary>
+      <div class="drawer-body">
+      <div class="control-block">
+        <label class="control-label" for={`search-${variant}`}>Search</label>
+        <input
+          id={`search-${variant}`}
+          type="search"
+          data-search-input
+          placeholder="Title, author, abstract…"
+          class="search-input"
+        />
+      </div>
+
+      <div class="control-block">
+        <label class="control-label" for={`sort-${variant}`}>Sort</label>
+        <select id={`sort-${variant}`} data-sort class="sort-select">
+          <option value="date-desc">Newest first</option>
+          <option value="date-asc">Oldest first</option>
+          <option value="title-asc">Title A–Z</option>
+          <option value="venue-asc">Venue type</option>
+        </select>
+      </div>
+
+      {
+        facets.map((facet) => (
+          <fieldset class="facet" class:list={[{ 'facet-scroll': facet.options.length > 8 }]}>
+            <legend class="control-label">{facet.legend}</legend>
+            {facet.options.map((opt) => (
+              <label class="facet-option">
+                <input type="checkbox" data-filter={facet.key} value={opt.value} />
+                <span class="facet-name">{label(opt.value)}</span>
+                <span class="facet-count">{opt.count}</span>
+              </label>
+            ))}
+          </fieldset>
+        ))
+      }
+
+      {
+        hiddenFacets.length > 0 && (
+          <p class="facet-note">
+            Hidden: {hiddenFacets.join(', ')} — only one distinct value in the current data, so
+            filtering on it cannot change the results.
+          </p>
+        )
+      }
+
+        {chartPosition === 'side' && <YearChart papers={papers} segmentBy={segmentBy} height={120} />}
+      </div>
+    </details>
+
+    <section class="results" data-results>
+      <header class="results-head">
+        <p class="results-count">
+          <strong data-count>{papers.length}</strong> of {papers.length} papers
+        </p>
+        <div class="results-actions">
+          <button type="button" data-clear class="clear-btn" hidden>Clear filters</button>
+          <div class="view-toggle" role="group" aria-label="View">
+            <button type="button" data-view-btn="tile" aria-pressed="true">Tiles</button>
+            <button type="button" data-view-btn="list" aria-pressed="false">List</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="paper-list" data-paper-list>
+        {papers.map((paper) => <Card paper={paper} />)}
+      </div>
+
+      <p class="empty" data-empty hidden>No papers match those filters.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+  import '../../scripts/papers-filter';
+</script>

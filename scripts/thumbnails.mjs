@@ -27,6 +27,13 @@ const CACHE_DIR = '.cache/pdfs';
 
 const DPI = 150;
 const TOP_FRACTION = 0.42; // How much of page 1 to keep — title block plus abstract head.
+
+/**
+ * Trim this share off each side. arXiv stamps a rotated "arXiv:xxxx [cs.HC] date" in the
+ * left margin, which is ugly in a thumbnail; cropping both sides equally removes it while
+ * keeping the title block optically centred.
+ */
+const SIDE_TRIM = 0.055;
 const WEBP_QUALITY = 78;
 const WEBP_WIDTH = 800;
 
@@ -65,13 +72,15 @@ async function renderTop(pdf, outBase) {
   const { width, height } = await pageSize(pdf);
   const pxWidth = Math.round((width * DPI) / 72);
   const pxHeight = Math.round(((height * DPI) / 72) * TOP_FRACTION);
+  const xOffset = Math.round(pxWidth * SIDE_TRIM);
+  const cropWidth = pxWidth - xOffset * 2;
 
   await run('pdftoppm', [
     '-f', '1', '-l', '1',
     '-r', String(DPI),
     '-png',
-    '-x', '0', '-y', '0',
-    '-W', String(pxWidth),
+    '-x', String(xOffset), '-y', '0',
+    '-W', String(cropWidth),
     '-H', String(pxHeight),
     '-singlefile',
     pdf,

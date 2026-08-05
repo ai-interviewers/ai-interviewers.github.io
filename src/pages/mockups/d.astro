@@ -1,0 +1,37 @@
+---
+import MockLayout from '../../layouts/MockLayout.astro';
+import Explorer from '../../components/mock/Explorer.astro';
+import { getPapers } from '../../lib/papers';
+
+const papers = await getPapers();
+---
+
+<MockLayout
+  variant="d"
+  palette="manila"
+  name="AI Interviewers"
+  eyebrow="Direction D · Transcript / stationery"
+  lede="Each paper is a transcript excerpt slip: a monospace slug line for the speaker, dashed rules as form fields, crop marks at the corners, highlighter hatching over domain tags. Unconfirmed classification renders as an unfilled field. Structure is fixed — use the switcher at the bottom to compare the three accent palettes."
+>
+  <Explorer papers={papers} variant="d" chartPosition="side" segmentBy="autonomy" />
+
+  <div class="palette-bar" role="group" aria-label="Accent palette">
+    <span>Palette</span>
+    <button type="button" data-palette-btn="manila" aria-pressed="true">Manila</button>
+    <button type="button" data-palette-btn="greptile" aria-pressed="false">Greptile</button>
+    <button type="button" data-palette-btn="muted" aria-pressed="false">Muted</button>
+  </div>
+
+  <script>
+    // Mockup-only control. Swaps the accent layer live so the palette is judged on real
+    // content with structure, type, and texture held constant.
+    const buttons = document.querySelectorAll<HTMLElement>('[data-palette-btn]');
+    for (const btn of buttons) {
+      btn.addEventListener('click', () => {
+        const choice = btn.dataset.paletteBtn!;
+        document.body.dataset.palette = choice;
+        for (const b of buttons) b.setAttribute('aria-pressed', String(b === btn));
+      });
+    }
+  </script>
+</MockLayout>

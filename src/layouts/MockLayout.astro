@@ -1,0 +1,60 @@
+---
+// Phase 2 mockups only. Deleted once a direction is chosen; nothing here ships.
+import '@fontsource-variable/source-serif-4';
+import '@fontsource-variable/inter';
+import '@fontsource-variable/jetbrains-mono';
+import '@fontsource-variable/anybody';
+import '@fontsource-variable/dm-sans';
+import '@fontsource/space-mono';
+import '../styles/mockups.css';
+
+interface Props {
+  variant: 'a' | 'b' | 'c' | 'd';
+  name: string;
+  eyebrow: string;
+  lede: string;
+  palette?: string;
+}
+
+const { variant, name, eyebrow, lede, palette } = Astro.props;
+
+const DIRECTIONS = [
+  { id: 'a', label: 'A · Archive' },
+  { id: 'b', label: 'B · Lab' },
+  { id: 'c', label: 'C · Data' },
+  { id: 'd', label: 'D · Transcript' },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Mockup {variant.toUpperCase()} — {name}</title>
+  </head>
+  <body data-variant={variant} data-palette={palette}>
+    <div class="mock-page">
+      <header class="mock-header">
+        <div class="mock-header-inner">
+          <p class="mock-eyebrow">{eyebrow}</p>
+          <h1 class="mock-title">{name}</h1>
+          <p class="mock-lede">{lede}</p>
+          <nav class="mock-nav" aria-label="Mockup directions">
+            <a href="/mockups">Index</a>
+            {
+              DIRECTIONS.map((d) => (
+                <a href={`/mockups/${d.id}`} aria-current={d.id === variant ? 'page' : undefined}>
+                  {d.label}
+                </a>
+              ))
+            }
+          </nav>
+        </div>
+      </header>
+
+      <slot />
+    </div>
+  </body>
+</html>

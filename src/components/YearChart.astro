@@ -1,0 +1,172 @@
+---
+import { papersByYear, label, type Paper } from '../lib/papers';
+
+interface Props {
+  papers: Paper[];
+  segmentBy?: 'autonomy' | 'type';
+  height?: number;
+}
+
+const { papers, segmentBy = 'autonomy', height = 150 } = Astro.props;
+const { rows, segments, max } = papersByYear(papers, segmentBy);
+
+// Chart segments are filter controls, so the key must match the facet key the
+// client script looks for.
+const filterKey = segmentBy === 'autonomy' ? 'autonomy' : 'type';
+---
+
+<figure class="year-chart" style={`--chart-height: ${height}px`}>
+  <div class="chart-legend">
+    {
+      segments.map((s, i) => (
+        <span class="legend-item" style={`--seg: var(--seg-${i + 1})`}>
+          <span class="legend-swatch" />
+          {label(s)}
+        </span>
+      ))
+    }
+  </div>
+
+  <div class="chart-plot">
+    {
+      rows.map((row) => (
+        <div class="chart-col">
+          <div class="chart-stack" style={`--fill: ${(row.total / max) * 100}%`}>
+            {
+              row.counts
+                .filter((c) => c.count > 0)
+                .map((c) => (
+                  <button
+                    type="button"
+                    class="chart-seg"
+                    data-chart-filter={`${filterKey}:${c.segment}`}
+                    style={`--seg: var(--seg-${segments.indexOf(c.segment) + 1}); --share: ${(c.count / row.total) * 100}%`}
+                    title={`${row.year} · ${label(c.segment)} · ${c.count}`}
+                    aria-label={`Filter to ${label(c.segment)} papers`}
+                  />
+                ))
+            }
+          </div>
+          <span class="chart-total">{row.total || ''}</span>
+          <span class="chart-year">{`'${String(row.year).slice(2)}`}</span>
+        </div>
+      ))
+    }
+  </div>
+
+  {/* The chart is decorative for screen readers; this table carries the data. */}
+  <table class="sr-only">
+    <caption>Papers per year by {segmentBy === 'autonomy' ? 'autonomy' : 'paper type'}</caption>
+    <thead>
+      <tr><th>Year</th>{segments.map((s) => <th>{label(s)}</th>)}<th>Total</th></tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((row) => (
+          <tr>
+            <th>{row.year}</th>
+            {segments.map((s) => <td>{row.counts.find((c) => c.segment === s)?.count ?? 0}</td>)}
+            <td>{row.total}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</figure>
+
+<style>
+  .year-chart {
+    margin: 0;
+  }
+
+  .chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.7rem;
+    color: var(--color-ink-muted);
+  }
+
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .legend-swatch {
+    width: 0.7rem;
+    height: 0.7rem;
+    background: var(--seg);
+    border-radius: var(--chart-radius, 2px);
+  }
+
+  .chart-plot {
+    display: flex;
+    align-items: flex-end;
+    gap: clamp(0.2rem, 1.5vw, 0.6rem);
+    height: var(--chart-height);
+  }
+
+  .chart-col {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-end;
+    height: 100%;
+    min-width: 0;
+  }
+
+  .chart-stack {
+    display: flex;
+    flex-direction: column-reverse;
+    height: var(--fill);
+    min-height: 2px;
+    overflow: hidden;
+    border-radius: var(--chart-radius, 2px);
+  }
+
+  .chart-seg {
+    height: var(--share);
+    padding: 0;
+    background: var(--seg);
+    border: 0;
+    cursor: pointer;
+    transition: opacity 120ms;
+  }
+
+  .chart-seg:hover {
+    opacity: 0.65;
+  }
+
+  .chart-total,
+  .chart-year {
+    text-align: center;
+    font-size: 0.65rem;
+    line-height: 1.5;
+    color: var(--color-ink-muted);
+  }
+
+  .chart-total {
+    order: -1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .chart-year {
+    margin-top: 0.35rem;
+    font-family: var(--font-mono);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+</style>
