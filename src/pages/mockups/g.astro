@@ -1,0 +1,14 @@
+---
+import MockLayout from '../../layouts/MockLayout.astro';
+import Explorer from '../../components/mock/Explorer.astro';
+import { getPapers } from '../../lib/papers';
+
+const papers = await getPapers();
+---
+
+<MockLayout variant="g" name="AI Interviewers" eyebrow="Round 2 · G · Manuscript" lede="Serif titles on uncoated stock with a coarser, more visible grain. Hovering a card sweeps a highlighter across the title, the way you would mark up a printed page.">
+  <Explorer papers={papers} variant="g" chartPosition="none" />
+  <div class="explorer" style="padding-top:0">
+    <p class="round-note">Texture: coarse grain. Highlighter: sweeps across the title on hover. Type: Source Serif + Space Mono. The most scholarly of the four.</p>
+  </div>
+</MockLayout>

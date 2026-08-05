@@ -287,6 +287,42 @@ the winner propagates to every page by swapping tokens rather than rewriting mar
 You review at `npm run dev`, on desktop and with the browser in mobile width. Mockup routes are
 deleted once you choose.
 
+#### Round 2 — the hybrid ✅ **built**
+
+Round 1 established that C's compact base was right and that D's transcript idea was appealing but
+too tech-forward. Round 2 fixes the structure and varies only ornament, so the remaining choice is
+about feel rather than layout.
+
+Fixed across E–H, per your notes:
+
+- **No tags or classification badges on cards.** They exist only as `data-*` attributes driving the
+  filters. Verified: a card's visible text is exactly `year · venue · title · author`.
+- **Title, author, year, and venue always present**, in tile *and* list view.
+- **Venue top-right**, carried over from D's slug line.
+- **Thumbnails in tile view.**
+- **No papers-per-year chart** on the papers page. `YearChart` still exists for the landing page.
+- Built on **C's compact base**; D's graph-paper ground and neon palette are gone.
+
+| | Texture | Highlighter | Type |
+|---|---|---|---|
+| **E · Index card** | Fine paper fibre | On the year | Inter + Space Mono |
+| **F · Ledger** | Legal-pad ruling + fibre | On the venue | DM Sans + Space Mono |
+| **G · Manuscript** | Coarse grain | Sweeps the title on hover | Source Serif + Space Mono |
+| **H · Warm minimal** | None (adjustable) | Marker underline | Inter + JetBrains Mono |
+
+Every Round 2 page carries a **texture strength control** (none / subtle / medium / strong) that
+scales that direction's own base. Texture amount is the one variable that cannot sensibly be chosen
+in the abstract, so it is dialled on real content rather than guessed. H starts at `none` as a genuine
+control for whether the stationery treatment earns its keep.
+
+Textures are generated — an SVG `feTurbulence` data URI for fibre, gradients for ruling — so nothing
+extra downloads.
+
+One implementation note worth keeping: Astro's scoped component styles
+(`.card-h[data-astro-cid-…]`) tie with `[data-variant='x'] .card-h` on specificity and win on source
+order, so any Round 2 rule overriding a property the component also sets is prefixed with `body` for
+the extra point. F's dashed borders silently stayed solid until this was found.
+
 #### Direction D in detail — transcript / stationery
 
 Derived from greptile.com's design language, which I inspected directly. The reusable recipe:

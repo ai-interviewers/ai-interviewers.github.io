@@ -5,10 +5,12 @@ import CardA from './CardA.astro';
 import CardB from './CardB.astro';
 import CardC from './CardC.astro';
 import CardD from './CardD.astro';
+import CardHybrid from './CardHybrid.astro';
 
 interface Props {
   papers: Paper[];
-  variant: 'a' | 'b' | 'c' | 'd';
+  /** a–d are Round 1; e–h are Round 2 and all share CardHybrid. */
+  variant: 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
   /** Direction C promotes the chart to the top as the primary navigation device. */
   chartPosition?: 'top' | 'side' | 'none';
   segmentBy?: 'autonomy' | 'type';
@@ -16,7 +18,16 @@ interface Props {
 
 const { papers, variant, chartPosition = 'side', segmentBy = 'autonomy' } = Astro.props;
 const facets = buildFacets(papers);
-const Card = { a: CardA, b: CardB, c: CardC, d: CardD }[variant];
+const Card = {
+  a: CardA,
+  b: CardB,
+  c: CardC,
+  d: CardD,
+  e: CardHybrid,
+  f: CardHybrid,
+  g: CardHybrid,
+  h: CardHybrid,
+}[variant];
 
 const hiddenFacets = ['autonomy', 'modality', 'type', 'venuetype', 'domain'].filter(
   (k) => !facets.some((f) => f.key === k),

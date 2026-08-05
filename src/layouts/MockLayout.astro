@@ -7,23 +7,35 @@ import '@fontsource-variable/anybody';
 import '@fontsource-variable/dm-sans';
 import '@fontsource/space-mono';
 import '../styles/mockups.css';
+import '../styles/round2.css';
 
 interface Props {
-  variant: 'a' | 'b' | 'c' | 'd';
+  variant: 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
   name: string;
   eyebrow: string;
   lede: string;
   palette?: string;
+  /** Round 2 only. Starting texture strength; adjustable on the page. */
+  texture?: 'none' | 'subtle' | 'medium' | 'strong';
 }
 
-const { variant, name, eyebrow, lede, palette } = Astro.props;
+const { variant, name, eyebrow, lede, palette, texture = 'medium' } = Astro.props;
 
-const DIRECTIONS = [
-  { id: 'a', label: 'A · Archive' },
-  { id: 'b', label: 'B · Lab' },
-  { id: 'c', label: 'C · Data' },
-  { id: 'd', label: 'D · Transcript' },
+const ROUND_2 = [
+  { id: 'e', label: 'E · Index card' },
+  { id: 'f', label: 'F · Ledger' },
+  { id: 'g', label: 'G · Manuscript' },
+  { id: 'h', label: 'H · Warm minimal' },
 ];
+
+const ROUND_1 = [
+  { id: 'a', label: 'A' },
+  { id: 'b', label: 'B' },
+  { id: 'c', label: 'C' },
+  { id: 'd', label: 'D' },
+];
+
+const round = ROUND_2.some((d) => d.id === variant) ? '2' : '1';
 ---
 
 <!doctype html>
@@ -34,7 +46,12 @@ const DIRECTIONS = [
     <meta name="robots" content="noindex, nofollow" />
     <title>Mockup {variant.toUpperCase()} — {name}</title>
   </head>
-  <body data-variant={variant} data-palette={palette}>
+  <body
+    data-variant={variant}
+    data-palette={palette}
+    data-round={round}
+    data-texture={round === '2' ? texture : undefined}
+  >
     <div class="mock-page">
       <header class="mock-header">
         <div class="mock-header-inner">
@@ -44,7 +61,15 @@ const DIRECTIONS = [
           <nav class="mock-nav" aria-label="Mockup directions">
             <a href="/mockups">Index</a>
             {
-              DIRECTIONS.map((d) => (
+              ROUND_2.map((d) => (
+                <a href={`/mockups/${d.id}`} aria-current={d.id === variant ? 'page' : undefined}>
+                  {d.label}
+                </a>
+              ))
+            }
+            <span class="mock-nav-sep">Round 1</span>
+            {
+              ROUND_1.map((d) => (
                 <a href={`/mockups/${d.id}`} aria-current={d.id === variant ? 'page' : undefined}>
                   {d.label}
                 </a>
@@ -55,6 +80,34 @@ const DIRECTIONS = [
       </header>
 
       <slot />
+
+      {
+        round === '2' && (
+          <div class="palette-bar" role="group" aria-label="Texture strength">
+            <span>Texture</span>
+            {['none', 'subtle', 'medium', 'strong'].map((t) => (
+              <button type="button" data-texture-btn={t} aria-pressed={String(t === texture)}>
+                {t}
+              </button>
+            ))}
+          </div>
+        )
+      }
     </div>
+
+    {
+      round === '2' && (
+        <script>
+          {/* Mockup-only control; scales each direction's own texture base. */}
+          const buttons = document.querySelectorAll('[data-texture-btn]');
+          for (const btn of buttons) {
+            btn.addEventListener('click', () => {
+              document.body.dataset.texture = btn.dataset.textureBtn;
+              for (const b of buttons) b.setAttribute('aria-pressed', String(b === btn));
+            });
+          }
+        </script>
+      )
+    }
   </body>
 </html>

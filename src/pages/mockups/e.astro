@@ -1,0 +1,14 @@
+---
+import MockLayout from '../../layouts/MockLayout.astro';
+import Explorer from '../../components/mock/Explorer.astro';
+import { getPapers } from '../../lib/papers';
+
+const papers = await getPapers();
+---
+
+<MockLayout variant="e" name="AI Interviewers" eyebrow="Round 2 · E · Index card" lede="Direction C's compact base on warm card stock, with a fine paper-fibre grain over the whole page. The year carries a highlighter swipe — it is the one number the eye scans for. Sans titles, monospace metadata.">
+  <Explorer papers={papers} variant="e" chartPosition="none" />
+  <div class="explorer" style="padding-top:0">
+    <p class="round-note">Texture: fine fibre grain. Highlighter: on the year. Type: Inter + Space Mono. Squared corners, faint card lift.</p>
+  </div>
+</MockLayout>
